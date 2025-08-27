@@ -34,44 +34,91 @@ import LabLayout from '../layouts/LabLayout.astro';
         <div class='hero-content'>
           <h1 class='hero-title'>Developer Labs</h1>
           <p class='hero-subtitle'>
-            Interactive tutorials and hands-on labs for building with Cloudflare's Developer Platform
+            A comprehensive directory of hands-on labs for mastering Cloudflare's Developer Platform.
           </p>
 
           <div class='hero-buttons'>
-            <a href='#labs' class='btn btn-primary'>Explore Labs →</a>
-            <a href='#features' class='btn btn-secondary'>Learn More</a>
+            <a href='#labs' class='btn btn-primary'>Browse All Labs →</a>
+            <a href='#features' class='btn btn-secondary'>Why Labs?</a>
           </div>
         </div>
 
-        <!-- Lab Overview Cards -->
+        <!-- Lab Directory -->
         <div class='workshop-overview' id='labs'>
           <div class='overview-card'>
-            <h3>🚀 Cloudflare Workers</h3>
-            <p>Build serverless applications at the edge with JavaScript. Learn Workers fundamentals, APIs, and deployment.</p>
-            <ul>
-              <li>HTTP APIs with routing</li>
-              <li>KV storage & caching</li>
-              <li>D1 database applications</li>
-              <li>AI-powered Workers</li>
-            </ul>
+            <div class='card-header'>
+              <div class='card-badge'>Beginner</div>
+              <h3>Learn Cloudflare Workers</h3>
+              <p class='card-subtitle'>🚀 Serverless Computing at the Edge</p>
+            </div>
+            
+            <div class='card-content'>
+              <p>Master serverless computing with JavaScript applications that run globally with zero cold starts.</p>
+              
+              <div class='card-highlights'>
+                <span class='highlight-tag'>HTTP APIs</span>
+                <span class='highlight-tag'>KV Storage</span>
+                <span class='highlight-tag'>D1 Database</span>
+                <span class='highlight-tag'>AI Integration</span>
+              </div>
+            </div>
+            
             <div class='card-footer'>
-              <span class='duration'>7 steps • ~2 hours</span>
+              <div class='card-meta'>
+                <span class='duration'>7 steps • ~2 hours</span>
+              </div>
               <a href='/labs/workers' class='btn btn-primary btn-sm'>Start Lab →</a>
             </div>
           </div>
 
           <div class='overview-card'>
-            <h3>🤖 Model Context Protocol</h3>
-            <p>Build AI assistant tools with MCP. Connect AI models to external data sources and services securely.</p>
-            <ul>
-              <li>Custom AI assistant tools</li>
-              <li>Persistent todo applications</li>
-              <li>External API integrations</li>
-              <li>Real-time data processors</li>
-            </ul>
+            <div class='card-header'>
+              <div class='card-badge intermediate'>Intermediate</div>
+              <h3>Learn MCP</h3>
+              <p class='card-subtitle'>🤖 Model Context Protocol for AI Assistant Integrations</p>
+            </div>
+            
+            <div class='card-content'>
+              <p>Build intelligent AI assistants that connect to external systems and extend capabilities beyond training data.</p>
+              
+              <div class='card-highlights'>
+                <span class='highlight-tag'>AI Tools</span>
+                <span class='highlight-tag'>External APIs</span>
+                <span class='highlight-tag'>Real-time Data</span>
+                <span class='highlight-tag'>Authentication</span>
+              </div>
+            </div>
+            
             <div class='card-footer'>
-              <span class='duration'>7 steps • ~2 hours</span>
+              <div class='card-meta'>
+                <span class='duration'>7 steps • ~2 hours</span>
+              </div>
               <a href='/labs/mcp' class='btn btn-primary btn-sm'>Start Lab →</a>
+            </div>
+          </div>
+
+          <div class='overview-card coming-soon'>
+            <div class='card-header'>
+              <div class='card-badge coming'>Coming Soon</div>
+              <h3>🔮 More Labs</h3>
+              <p class='card-subtitle'>Expanding Our Directory</p>
+            </div>
+            
+            <div class='card-content'>
+              <p>We're developing new tutorials covering R2 storage, Durable Objects, and advanced AI workflows.</p>
+              
+              <div class='card-highlights'>
+                <span class='highlight-tag'>R2 Storage</span>
+                <span class='highlight-tag'>Durable Objects</span>
+                <span class='highlight-tag'>AI Gateway</span>
+                <span class='highlight-tag'>Performance</span>
+              </div>
+            </div>
+            
+            <div class='card-footer'>
+              <div class='card-meta'>
+                <span class='duration'>Q4 2025</span>
+              </div>
             </div>
           </div>
         </div>
@@ -81,30 +128,33 @@ import LabLayout from '../layouts/LabLayout.astro';
     <!-- Features Section -->
     <section id='features' class='section'>
       <div class='container'>
-        <h2 class='section-title'>Why Developer Labs?</h2>
+        <h2 class='section-title'>Why Choose Our Lab Directory?</h2>
         
         <div class='fundamentals-grid'>
           <div class='fundamentals-card'>
-            <h3>🎯 Hands-on Learning</h3>
+            <h3>🎯 Curated Learning Paths</h3>
             <p>
-              Build real applications step-by-step with guided tutorials. Each lab includes 
-              interactive exercises, code examples, and practical projects you can deploy.
+              Each lab is carefully designed with progressive difficulty and real-world applications. 
+              Our directory organizes tutorials by skill level, technology focus, and learning objectives 
+              to help you find exactly what you need.
             </p>
           </div>
 
           <div class='fundamentals-card'>
-            <h3>🚀 Production Ready</h3>
+            <h3>🚀 Production-Ready Skills</h3>
             <p>
-              Deploy your projects to Cloudflare's global network with a single command. 
-              Learn best practices for building scalable, performant applications.
+              Learn by building applications you can actually deploy and use. Every lab teaches 
+              industry best practices, security considerations, and performance optimization 
+              techniques used by top developers.
             </p>
           </div>
 
           <div class='fundamentals-card'>
-            <h3>💡 Modern Stack</h3>
+            <h3>⚡ Self-Paced Learning</h3>
             <p>
-              Master the latest technologies including serverless computing, edge AI, 
-              and distributed databases. Stay ahead with cutting-edge development patterns.
+              Learn at your own speed with detailed step-by-step instructions, code examples, 
+              and troubleshooting guides. Each lab is designed to be completed independently 
+              or as part of a larger learning journey.
             </p>
           </div>
         </div>
@@ -114,36 +164,36 @@ import LabLayout from '../layouts/LabLayout.astro';
     <!-- Getting Started -->
     <section class='section section-alt'>
       <div class='container'>
-        <h2 class='section-title'>Get Started</h2>
-        <p class='intro-text'>Ready to build? Choose your learning path:</p>
+        <h2 class='section-title'>Find Your Perfect Lab</h2>
+        <p class='intro-text'>Browse our directory by skill level, technology, or learning goal:</p>
 
         <div class='prerequisites-grid'>
           <div class='prereq-item'>
-            <span class='prereq-icon'>⚡</span>
+            <span class='prereq-icon'>🌱</span>
             <div class='prereq-content'>
-              <h4>New to Serverless?</h4>
-              <p>Start with <a href='/labs/workers'>Cloudflare Workers</a> to learn edge computing fundamentals</p>
+              <h4>Beginner Labs</h4>
+              <p>New to Cloudflare? Start with <a href='/labs/workers'>Workers fundamentals</a> and basic edge computing concepts</p>
             </div>
           </div>
           <div class='prereq-item'>
-            <span class='prereq-icon'>🤖</span>
+            <span class='prereq-icon'>🚀</span>
             <div class='prereq-content'>
-              <h4>Building AI Tools?</h4>
-              <p>Explore <a href='/labs/mcp'>Model Context Protocol</a> for AI assistant integrations</p>
+              <h4>Intermediate Labs</h4>
+              <p>Ready for more? Dive into <a href='/labs/mcp'>AI integrations</a> and advanced serverless patterns</p>
             </div>
           </div>
           <div class='prereq-item'>
-            <span class='prereq-icon'>🛠️</span>
+            <span class='prereq-icon'>🎯</span>
             <div class='prereq-content'>
-              <h4>Prerequisites</h4>
-              <p>Node.js v18+, Cloudflare account, and basic JavaScript knowledge</p>
+              <h4>By Technology</h4>
+              <p>Focus on specific tools: Workers, AI Gateway, D1 Database, KV Storage, or Durable Objects</p>
             </div>
           </div>
           <div class='prereq-item'>
-            <span class='prereq-icon'>⏱️</span>
+            <span class='prereq-icon'>🏆</span>
             <div class='prereq-content'>
-              <h4>Time Commitment</h4>
-              <p>Each lab takes ~2 hours with progressive, hands-on exercises</p>
+              <h4>Learning Outcomes</h4>
+              <p>Build deployable applications, earn completion certificates, and join our developer community</p>
             </div>
           </div>
         </div>
