@@ -1,0 +1,179 @@
+/* Copy to Clipboard Button Styles */
+
+.copy-btn {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(-2px);
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Show button on hover */
+pre:hover .copy-btn,
+.code-block:hover .copy-btn,
+.copy-btn:focus {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Button hover state */
+.copy-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Button active state */
+.copy-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Success state */
+.copy-btn.copy-success {
+  background: var(--success-bg, #dcfce7);
+  border-color: var(--success-border, #16a34a);
+  color: var(--success-text, #15803d);
+  opacity: 1;
+}
+
+/* Error state */
+.copy-btn.copy-error {
+  background: var(--error-bg, #fef2f2);
+  border-color: var(--error-border, #dc2626);
+  color: var(--error-text, #b91c1c);
+  opacity: 1;
+}
+
+/* Disabled state */
+.copy-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .copy-btn {
+  background: var(--bg-primary);
+  border-color: var(--border-secondary);
+}
+
+[data-theme="dark"] .copy-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-primary);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .copy-btn {
+    opacity: 1; /* Always visible on mobile */
+    position: static;
+    display: block;
+    margin: var(--space-2) 0 0 auto;
+    width: fit-content;
+  }
+  
+  /* Adjust code block container on mobile */
+  pre {
+    padding-top: calc(var(--space-4) + 2rem);
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .copy-btn {
+    border-width: 2px;
+    font-weight: var(--weight-semibold);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .copy-btn {
+    transition: none;
+    transform: none;
+  }
+  
+  .copy-btn:hover {
+    transform: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.copy-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+/* Animation for feedback states */
+@keyframes copySuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes copyError {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+.copy-btn.copy-success {
+  animation: copySuccess 0.3s ease-out;
+}
+
+.copy-btn.copy-error {
+  animation: copyError 0.3s ease-out;
+}
+
+/* Ensure code blocks have proper positioning context */
+pre {
+  position: relative;
+}
+
+.code-block {
+  position: relative;
+}
+
+/* Improve code block styling for copy button integration */
+pre code {
+  display: block;
+  padding-right: calc(var(--space-12) + var(--space-4)); /* Make room for button */
+}
+
+/* Special handling for inline code blocks */
+p code,
+li code {
+  position: relative;
+}
+
+p code .copy-btn,
+li code .copy-btn {
+  position: absolute;
+  top: 50%;
+  right: var(--space-1);
+  transform: translateY(-50%);
+  padding: var(--space-half) var(--space-1);
+  font-size: 10px;
+  opacity: 0;
+}
+
+p:hover code .copy-btn,
+li:hover code .copy-btn {
+  opacity: 1;
+}

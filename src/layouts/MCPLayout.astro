@@ -1,0 +1,137 @@
+---
+interface Props {
+	title: string;
+	description?: string;
+	image?: string;
+	url?: string;
+}
+
+const { 
+	title, 
+	description = "Learn to build Model Context Protocol (MCP) servers with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+	image = "https://learnmcp.examples.workers.dev/og-image.png",
+	url = "https://learnmcp.examples.workers.dev/"
+} = Astro.props;
+
+const fullTitle = title === "Learn MCP" ? "Learn MCP - Build a Model Context Protocol server with Cloudflare Workers" : `${title} | Learn MCP`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		
+		<!-- Primary Meta Tags -->
+		<title>{fullTitle}</title>
+		<meta name="title" content={fullTitle} />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+		<meta name="author" content="Cloudflare" />
+		<meta name="keywords" content="MCP, Model Context Protocol, Cloudflare Workers, Hono, AI tools, tutorial, hands-on labs, API integration, serverless" />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={url} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={image} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:site_name" content="Learn MCP" />
+		<meta property="og:locale" content="en_US" />
+		
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={url} />
+		<meta property="twitter:title" content={fullTitle} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={image} />
+		<meta property="twitter:creator" content="@cloudflare" />
+		<meta property="twitter:site" content="@cloudflare" />
+		
+		<!-- Additional Meta Tags -->
+		<meta name="theme-color" content="#f38020" />
+		<meta name="msapplication-TileColor" content="#f38020" />
+		<meta name="application-name" content="Learn MCP" />
+		
+		<!-- Canonical URL -->
+		<link rel="canonical" href={url} />
+		
+		<!-- Favicon and Icons -->
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		
+		<!-- Lab Stylesheets -->
+		<link rel="stylesheet" href="/assets/css/main.css">
+		<link rel="stylesheet" href="/assets/css/step-content-overflow.css">
+		
+		<!-- Preconnect for performance -->
+		<link rel="preconnect" href="https://www.cloudflare.com" />
+		
+		<!-- Generator -->
+		<meta name="generator" content={Astro.generator} />
+		
+		<!-- Structured Data -->
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "Course",
+			"name": "Learn MCP - Build a Model Context Protocol server with Cloudflare Workers",
+			"description": "Learn to build Model Context Protocol (MCP) servers with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+			"provider": {
+				"@type": "Organization",
+				"name": "Cloudflare",
+				"url": "https://cloudflare.com"
+			},
+			"educationalLevel": "Intermediate",
+			"teaches": [
+				"Model Context Protocol (MCP)",
+				"Cloudflare Workers",
+				"Hono Framework",
+				"API Integration",
+				"Serverless Development"
+			],
+			"url": "https://learnmcp.examples.workers.dev/",
+			"image": "https://learnmcp.examples.workers.dev/og-image.png"
+		}
+		</script>
+	</head>
+	<body>
+		<slot />
+	<script type="module" src="/assets/js/app.js"></script>
+	</body>
+</html>
+<style is:global>
+	:root {
+		--accent: 136, 58, 234;
+		--accent-light: 224, 204, 250;
+		--accent-dark: 49, 10, 101;
+		--accent-gradient: linear-gradient(
+			45deg,
+			rgb(var(--accent)),
+			rgb(var(--accent-light)) 30%,
+			white 60%
+		);
+	}
+	html {
+		font-family: system-ui, sans-serif;
+		background: #13151a;
+		background-size: 224px;
+	}
+	code {
+		font-family:
+			Menlo,
+			Monaco,
+			Lucida Console,
+			Liberation Mono,
+			DejaVu Sans Mono,
+			Bitstream Vera Sans Mono,
+			Courier New,
+			monospace;
+	}
+</style>

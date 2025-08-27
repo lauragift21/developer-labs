@@ -1,0 +1,597 @@
+---
+title: "Workers AI Integration"
+description: "Integrate powerful AI models into your Cloudflare Workers using Workers AI for text generation, image analysis, and more."
+stepNumber: 5
+duration: "45 min"
+difficulty: "intermediate"
+tags: ["ai", "machine-learning", "text-generation", "image-analysis", "workers-ai"]
+prerequisites: ["Completed Step 4", "D1 database configured", "Understanding of async/await", "Basic knowledge of AI concepts"]
+learningObjectives: [
+  "Integrate Workers AI models into your applications",
+  "Implement text generation and classification",
+  "Add image analysis capabilities",
+  "Handle AI model responses and errors",
+  "Build AI-powered endpoints"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+import StepNavigation from '../../components/StepNavigation.astro';
+
+<Callout type="important" title="Workers AI Platform">
+Workers AI provides access to powerful machine learning models directly in your Workers, with no infrastructure management required.
+
+- **Text Generation:** Large language models for content creation
+- **Image Analysis:** Computer vision for image classification and description
+- **Text Classification:** Sentiment analysis and content moderation
+- **Translation:** Multi-language text translation
+- **Speech Recognition:** Audio transcription capabilities
+</Callout>
+
+## Step 1: Set Up Workers AI
+
+<StepObjective 
+  what="A Worker configured with Workers AI bindings and basic model integration."
+  why="Workers AI provides serverless access to AI models without managing infrastructure or GPU resources."
+/>
+
+### Configure AI Binding
+
+First, add the Workers AI binding to your `wrangler.jsonc`:
+
+```json title="wrangler.jsonc"
+{
+  "name": "ai-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2024-01-01",
+  "ai": {
+    "binding": "AI"
+  }
+}
+```
+
+### Basic AI Worker Structure
+
+```typescript title="src/index.ts"
+export interface Env {
+  AI: Ai;
+}
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    
+    // Route AI endpoints
+    if (url.pathname === '/generate') {
+      return handleTextGeneration(request, env);
+    }
+    
+    if (url.pathname === '/analyze') {
+      return handleImageAnalysis(request, env);
+    }
+    
+    if (url.pathname === '/classify') {
+      return handleTextClassification(request, env);
+    }
+    
+    return new Response('AI Worker Ready! Try /generate, /analyze, or /classify', {
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  },
+};
+```
+
+<Callout type="note" title="AI Binding">
+The `AI` binding in your environment provides access to all Workers AI models. No API keys or authentication required!
+</Callout>
+
+## Step 2: Implement Text Generation
+
+<StepObjective 
+  what="Text generation endpoints using large language models for content creation and conversation."
+  why="Text generation is one of the most versatile AI capabilities, useful for chatbots, content creation, and text processing."
+/>
+
+### Text Generation Handler
+
+```typescript title="Text Generation Implementation"
+interface TextGenerationRequest {
+  prompt: string;
+  model?: string;
+}
+
+interface TextGenerationResponse {
+  success: boolean;
+  model?: string;
+  response?: string;
+  usage?: any;
+  error?: string;
+}
+
+interface AIMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+async function handleTextGeneration(request: Request, env: Env): Promise<Response> {
+  if (request.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 });
+  }
+  
+  try {
+    const { prompt, model = '@cf/meta/llama-3.1-8b-instruct' }: TextGenerationRequest = await request.json();
+    
+    if (!prompt) {
+      return new Response('Prompt is required', { status: 400 });
+    }
+    
+    // Generate text using Workers AI
+    const messages: AIMessage[] = [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: prompt }
+    ];
+    
+    const response = await env.AI.run(model, {
+      messages,
+      max_tokens: 512,
+      temperature: 0.7
+    });
+    
+    const successResponse: TextGenerationResponse = {
+      success: true,
+      model: model,
+      response: response.response,
+      usage: response.usage
+    };
+    
+    return new Response(JSON.stringify(successResponse), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+  } catch (error: any) {
+    console.error('Text generation error:', error);
+    const errorResponse: TextGenerationResponse = {
+      success: false,
+      error: 'Failed to generate text'
+    };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+```
+
+### Test Text Generation
+
+```bash title="Test Text Generation"
+curl -X POST https://your-worker.your-subdomain.workers.dev/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Write a short story about a robot learning to paint"
+  }'
+```
+
+<Callout type="tip" title="Available Models">
+Workers AI supports multiple text generation models:
+- `@cf/meta/llama-3.1-8b-instruct` - Balanced performance and quality
+- `@cf/mistral/mistral-7b-instruct-v0.1` - Fast inference
+- `@cf/microsoft/phi-2` - Lightweight model for simple tasks
+</Callout>
+
+## Step 3: Add Image Analysis
+
+<StepObjective 
+  what="Image analysis capabilities including classification and visual description generation."
+  why="Computer vision enables applications to understand and process visual content automatically."
+/>
+
+### Image Analysis Handler
+
+```typescript title="Image Analysis Implementation"
+interface ImageAnalysisResponse {
+  success: boolean;
+  analysisType?: string;
+  result?: any;
+  error?: string;
+}
+
+async function handleImageAnalysis(request: Request, env: Env): Promise<Response> {
+  if (request.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 });
+  }
+  
+  try {
+    const formData = await request.formData();
+    const imageFile = formData.get('image') as File | null;
+    const analysisType = (formData.get('type') as string) || 'classify';
+    
+    if (!imageFile) {
+      return new Response('Image file is required', { status: 400 });
+    }
+    
+    const imageBuffer = await imageFile.arrayBuffer();
+    
+    let result: any;
+    
+    if (analysisType === 'classify') {
+      // Image classification
+      result = await env.AI.run('@cf/microsoft/resnet-50', {
+        image: imageBuffer
+      });
+    } else if (analysisType === 'describe') {
+      // Image description
+      result = await env.AI.run('@cf/llava-hf/llava-1.5-7b-hf', {
+        image: imageBuffer,
+        prompt: 'Describe this image in detail',
+        max_tokens: 512
+      });
+    }
+    
+    const successResponse: ImageAnalysisResponse = {
+      success: true,
+      analysisType: analysisType,
+      result: result
+    };
+    
+    return new Response(JSON.stringify(successResponse), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+  } catch (error: any) {
+    console.error('Image analysis error:', error);
+    const errorResponse: ImageAnalysisResponse = {
+      success: false,
+      error: 'Failed to analyze image'
+    };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+```
+
+### Test Image Analysis
+
+```bash title="Test Image Classification"
+curl -X POST https://your-worker.your-subdomain.workers.dev/analyze \
+  -F "image=@path/to/your/image.jpg" \
+  -F "type=classify"
+```
+
+<Callout type="important" title="Image Formats">
+Workers AI supports common image formats: JPEG, PNG, GIF, and WebP. Maximum file size is typically 10MB.
+</Callout>
+
+## Step 4: Implement Text Classification
+
+<StepObjective 
+  what="Text classification for sentiment analysis, content moderation, and text categorization."
+  why="Text classification helps automate content analysis, moderation, and user feedback processing."
+/>
+
+### Text Classification Handler
+
+```typescript title="Text Classification Implementation"
+interface TextClassificationRequest {
+  text: string;
+  task?: 'sentiment' | 'moderation';
+}
+
+interface TextClassificationResponse {
+  success: boolean;
+  task?: string;
+  text?: string;
+  classification?: any;
+  error?: string;
+}
+
+async function handleTextClassification(request: Request, env: Env): Promise<Response> {
+  if (request.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 });
+  }
+  
+  try {
+    const { text, task = 'sentiment' }: TextClassificationRequest = await request.json();
+    
+    if (!text) {
+      return new Response('Text is required', { status: 400 });
+    }
+    
+    let result: any;
+    
+    if (task === 'sentiment') {
+      // Sentiment analysis
+      result = await env.AI.run('@cf/huggingface/distilbert-sst-2-int8', {
+        text: text
+      });
+    } else if (task === 'moderation') {
+      // Content moderation
+      result = await env.AI.run('@cf/openai/moderation', {
+        input: text
+      });
+    }
+    
+    const successResponse: TextClassificationResponse = {
+      success: true,
+      task: task,
+      text: text,
+      classification: result
+    };
+    
+    return new Response(JSON.stringify(successResponse), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+  } catch (error: any) {
+    console.error('Text classification error:', error);
+    const errorResponse: TextClassificationResponse = {
+      success: false,
+      error: 'Failed to classify text'
+    };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+```
+
+### Test Text Classification
+
+```bash title="Test Sentiment Analysis"
+curl -X POST https://your-worker.your-subdomain.workers.dev/classify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "I love using Cloudflare Workers AI!",
+    "task": "sentiment"
+  }'
+```
+
+## Step 5: Build an AI Chat Interface
+
+<StepObjective 
+  what="A complete AI chat interface that demonstrates multiple Workers AI capabilities in a single application."
+  why="Combining multiple AI models creates more powerful and interactive user experiences."
+/>
+
+### Enhanced Chat Worker
+
+```typescript title="AI Chat Interface"
+interface ChatRequest {
+  message: string;
+  includeAnalysis?: boolean;
+}
+
+interface ChatResponse {
+  response?: string;
+  analysis?: any;
+  timestamp?: string;
+  error?: string;
+}
+
+export interface Env {
+  AI: Ai;
+}
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    
+    // Serve chat interface
+    if (url.pathname === '/' && request.method === 'GET') {
+      return new Response(getChatHTML(), {
+        headers: { 'Content-Type': 'text/html' }
+      });
+    }
+    
+    // Handle chat messages
+    if (url.pathname === '/chat' && request.method === 'POST') {
+      return handleChat(request, env);
+    }
+    
+    return new Response('Not found', { status: 404 });
+  },
+};
+
+async function handleChat(request: Request, env: Env): Promise<Response> {
+  try {
+    const { message, includeAnalysis = false }: ChatRequest = await request.json();
+    
+    // Generate response
+    const messages: AIMessage[] = [
+      { role: 'system', content: 'You are a helpful AI assistant.' },
+      { role: 'user', content: message }
+    ];
+    
+    const aiResponse = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+      messages,
+      max_tokens: 256
+    });
+    
+    let analysis: any = null;
+    if (includeAnalysis) {
+      // Analyze sentiment of user message
+      analysis = await env.AI.run('@cf/huggingface/distilbert-sst-2-int8', {
+        text: message
+      });
+    }
+    
+    const chatResponse: ChatResponse = {
+      response: aiResponse.response,
+      analysis: analysis,
+      timestamp: new Date().toISOString()
+    };
+    
+    return new Response(JSON.stringify(chatResponse), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+  } catch (error: any) {
+    const errorResponse: ChatResponse = {
+      error: 'Failed to process chat message'
+    };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+function getChatHTML(): string {
+  return `<!DOCTYPE html>
+<html>
+<head>
+    <title>Workers AI Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #messages { height: 400px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; margin-bottom: 10px; }
+        .message { margin-bottom: 10px; padding: 8px; border-radius: 4px; }
+        .user { background-color: #e3f2fd; text-align: right; }
+        .ai { background-color: #f3e5f5; }
+        .analysis { font-size: 0.8em; color: #666; margin-top: 5px; }
+        input[type="text"] { width: 70%; padding: 8px; }
+        button { padding: 8px 16px; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Workers AI Chat Interface</h1>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+    <label><input type="checkbox" id="includeAnalysis"> Include sentiment analysis</label>
+    
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        includeAnalysis: document.getElementById('includeAnalysis').checked
+                    })
+                });
+                
+                const data = await response.json();
+                addMessage('ai', data.response, data.analysis);
+            } catch (error) {
+                addMessage('ai', 'Sorry, I encountered an error.');
+            }
+        }
+        
+        function addMessage(sender, text, analysis = null) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'message ' + sender;
+            div.innerHTML = '<strong>' + (sender === 'user' ? 'You' : 'AI') + ':</strong> ' + text;
+            
+            if (analysis) {
+                const analysisDiv = document.createElement('div');
+                analysisDiv.className = 'analysis';
+                analysisDiv.textContent = 'Sentiment: ' + analysis[0].label + ' (' + (analysis[0].score * 100).toFixed(1) + '%)';
+                div.appendChild(analysisDiv);
+            }
+            
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>`;
+}
+```
+
+## Step 6: Deploy and Test
+
+<StepObjective 
+  what="A fully deployed AI-powered Worker with comprehensive testing of all AI capabilities."
+  why="Testing ensures your AI integrations work correctly and handle edge cases gracefully."
+/>
+
+### Deploy Your AI Worker
+
+```bash title="Deploy AI Worker"
+# Deploy to Cloudflare
+wrangler deploy
+
+# Test all endpoints
+curl https://your-worker.your-subdomain.workers.dev/
+```
+
+### Testing Checklist
+
+<Callout type="tip" title="AI Testing Strategy">
+Test these scenarios to ensure robust AI integration:
+
+- **Text Generation:** Various prompt lengths and complexity
+- **Image Analysis:** Different image formats and sizes
+- **Error Handling:** Invalid inputs and network failures
+- **Rate Limits:** High-frequency requests
+- **Model Fallbacks:** Alternative models when primary fails
+</Callout>
+
+```bash title="Comprehensive Testing"
+# Test text generation
+curl -X POST https://your-worker.your-subdomain.workers.dev/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Explain quantum computing in simple terms"}'
+
+# Test sentiment analysis
+curl -X POST https://your-worker.your-subdomain.workers.dev/classify \
+  -H "Content-Type: application/json" \
+  -d '{"text": "This is amazing!", "task": "sentiment"}'
+
+# Test chat interface
+open https://your-worker.your-subdomain.workers.dev/
+```
+
+### Production Considerations
+
+<Callout type="important" title="AI in Production">
+Consider these factors for production AI applications:
+
+- **Rate Limiting:** Implement request throttling to manage costs
+- **Caching:** Cache AI responses for repeated queries
+- **Error Handling:** Graceful fallbacks when models are unavailable
+- **Monitoring:** Track usage, latency, and error rates
+- **Content Filtering:** Implement safety measures for user-generated content
+</Callout>
+
+```bash title="AI Integration Complete! 🤖"
+✅ Workers AI models integrated
+🧠 Text generation working
+👁️ Image analysis functional
+📊 Text classification active
+💬 Interactive chat interface deployed
+🚀 Ready for AI-powered applications!
+```
+
+✅ **Outstanding work!** You've successfully integrated Workers AI into your applications. Ready to learn about AI Gateway in Step 6!
+
+<StepNavigation 
+  currentStep={5}
+  totalSteps={7}
+  prevStep={{
+    title: "D1 Database Integration",
+    slug: "#step-4"
+  }}
+  nextStep={{
+    title: "AI Gateway Integration",
+    slug: "#step-6"
+  }}
+/>

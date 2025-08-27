@@ -1,0 +1,162 @@
+---
+title: "Getting Started with Cloudflare Workers"
+description: "Create your first Cloudflare Worker and understand the fundamentals of serverless edge computing. Learn about the Workers runtime and deploy your first function."
+stepNumber: 1
+duration: "25 min"
+difficulty: "beginner"
+tags: ["setup", "cloudflare", "workers", "serverless", "edge"]
+prerequisites: ["Node.js v18+", "Cloudflare Account", "Terminal/Command Line", "Basic JavaScript knowledge"]
+learningObjectives: [
+  "Create and deploy your first Cloudflare Worker",
+  "Understand the Workers runtime environment",
+  "Learn about edge computing concepts",
+  "Test your Worker using Wrangler CLI"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import Callout from '../../components/Callout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import StepObjective from '../../components/StepObjective.astro';
+import StepNavigation from '../../components/StepNavigation.astro';
+
+<Callout type="tool" title="Understanding Cloudflare Workers">
+Cloudflare Workers is a serverless platform for building, deploying, and scaling applications across Cloudflare's global network with a single command and no infrastructure to manage.
+
+- **Edge Computing:** Code runs at locations closest to users for minimal latency
+- **V8 Isolates:** Lightweight, secure runtime environment (not containers)
+- **Global Network:** Deploy once, run everywhere across Cloudflare's infrastructure
+- **Serverless:** No servers to manage, automatic scaling, pay-per-request
+</Callout>
+
+## Step 1: Create Your First Worker
+
+<StepObjective 
+  what="A simple Cloudflare Worker that responds to HTTP requests with a custom message."
+  why="Workers handle HTTP requests at the edge, providing fast responses to users worldwide with minimal setup."
+/>
+
+```bash
+# Create a new Worker project with TypeScript
+npm create cloudflare@latest -- my-first-worker --type hello-world --ts
+
+# Navigate to your project
+cd my-first-worker
+
+# Start development server
+npx wrangler dev
+```
+
+<CodeBlock title="Expected Output">
+⎔ Starting local server...
+[wrangler:info] Ready on http://localhost:8787
+🌍 Your Worker is running locally and ready for testing
+📝 Edit src/index.ts to see changes in real-time
+</CodeBlock>
+
+<Callout type="note" title="What Just Happened?">
+You've created a Cloudflare Worker that includes:
+- **HTTP Handler:** Function that processes incoming requests
+- **Local Development:** Wrangler dev server for testing
+- **Hot Reloading:** Changes reflect immediately during development
+</Callout>
+
+<details>
+<summary><strong>Troubleshooting</strong></summary>
+
+- **npm not found:** Install Node.js v18+ from nodejs.org
+- **Template not found:** Update npm: `npm install -g npm@latest`
+- **Permission denied:** Use `sudo npm install -g wrangler` (macOS/Linux)
+- **Port 8787 busy:** Stop other services or use `npm run dev -- --port 8788`
+- **Build errors:** Delete `node_modules` and run `npm install` again
+
+</details>
+
+## Step 2: Understanding Your Worker Code
+
+<StepObjective 
+  what="Understanding of your Worker's code structure and how it processes HTTP requests."
+  why="Understanding the fetch handler is fundamental to building any application with Cloudflare Workers."
+/>
+
+Let's examine the default Worker code that was generated:
+
+```typescript
+// src/index.ts
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    return new Response('Hello World!');
+  },
+};
+```
+
+<Callout type="note" title="Worker Structure">
+Every Cloudflare Worker exports a default object with handler functions:
+- **fetch:** Handles HTTP requests (required for web applications)
+- **scheduled:** Handles cron triggers (optional)
+- **queue:** Handles queue messages (optional)
+- **email:** Handles email events (optional)
+</Callout>
+
+### The Fetch Handler Parameters:
+- **request:** Contains the incoming HTTP request (URL, headers, method, body)
+- **env:** Environment variables and bindings (KV, R2, D1, etc.)
+- **ctx:** Context object with `waitUntil()` and `passThroughOnException()`
+
+## Step 3: Test Your Worker
+
+<StepObjective 
+  what="A working local development environment where you can test your Worker and see changes in real-time."
+  why="Local testing is essential for rapid development and debugging before deploying to production."
+/>
+
+### Testing Your Worker:
+
+1. **Open your browser** and navigate to `http://localhost:8787`
+2. **You should see:** "Hello World!" displayed in your browser
+3. **Try different URLs** like `http://localhost:8787/test` - same response
+4. **Check the terminal** for request logs showing method, path, and response time
+
+<Callout type="note" title="What You Should See">
+Your terminal will show logs like:
+- `GET / 200 OK (2ms)` - successful request
+- Hot reloading when you save file changes
+- Any console.log() output from your Worker
+</Callout>
+
+
+## Step 4: Deploy to Production
+
+<StepObjective 
+  what="Your first Worker deployed to Cloudflare's global network, accessible via a workers.dev subdomain."
+  why="Deploying to production lets you see your Worker running at the edge across Cloudflare's global network."
+/>
+
+```bash
+# Deploy your Worker to production
+npx wrangler deploy
+```
+
+After deployment, you'll see:
+- **Your Worker URL:** `https://my-first-worker.<your-subdomain>.workers.dev`
+- **Global deployment** across 300+ data centers
+- **Instant availability** worldwide
+
+<Callout type="note" title="Production Deployment">
+Your Worker is now running on Cloudflare's global network:
+- **Global reach:** Available from 300+ locations worldwide
+- **Automatic scaling:** Handles traffic spikes without configuration
+- **Zero cold starts:** V8 isolates start instantly
+- **Built-in security:** DDoS protection and security features included
+</Callout>
+
+✅ **Congratulations!** You've created and deployed your first Cloudflare Worker. You're ready to learn HTTP request handling in Step 2!
+
+<StepNavigation 
+  currentStep={1}
+  totalSteps={7}
+  nextStep={{
+    title: "HTTP Request Handling",
+    slug: "#step-2"
+  }}
+/>

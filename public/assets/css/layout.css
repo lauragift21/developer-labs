@@ -1,0 +1,293 @@
+/* Layout Styles */
+
+/* Main Layout */
+main {
+  padding-top: var(--nav-height);
+  min-height: 100vh;
+}
+
+.section {
+  padding: var(--space-16) 0;
+  position: relative;
+}
+
+.section-title {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  text-align: center;
+  margin-bottom: var(--space-4);
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.light-mode .section-title {
+  background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-700) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-subtitle {
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-8);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  background-color: var(--bg-primary);
+  padding: var(--space-20) 0 var(--space-16) 0;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 50%, var(--brand-orange-light) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--brand-purple) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, var(--brand-blue) 0%, transparent 50%);
+  opacity: 0.1;
+  filter: blur(100px);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto var(--space-12) auto;
+}
+
+.hero-title {
+  font-size: var(--text-6xl);
+  font-weight: var(--weight-black);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-6);
+  color: var(--text-primary);
+  transition: color var(--duration-normal) var(--ease-out);
+}
+
+body.light-mode .hero-title {
+  color: var(--gray-900);
+}
+
+.hero-subtitle {
+  font-size: var(--text-xl);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* Workshop Overview Grid */
+.workshop-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-12);
+}
+
+.overview-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+/* Hands-on Section - Fixed Layout */
+.hands-on-container,
+.labs-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+  min-height: 70vh;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Ensure desktop layout stays side-by-side */
+@media (min-width: 1025px) {
+  .hands-on-container,
+  .labs-grid {
+    grid-template-columns: 300px 1fr !important;
+  }
+}
+
+.lab-nav {
+  position: sticky;
+  top: calc(var(--nav-height) + var(--space-6));
+  height: fit-content;
+  max-height: calc(100vh - var(--nav-height) - var(--space-12));
+  overflow-y: auto;
+}
+
+.nav-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
+  font-weight: var(--weight-semibold);
+}
+
+.lab-nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.lab-content {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  min-height: 70vh;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+body.light-mode .lab-content {
+  background-color: var(--bg-surface);
+  border-color: var(--border-primary);
+}
+
+/* Resources Grid */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+/* Footer */
+.footer {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-primary);
+  padding: var(--space-12) 0 var(--space-8) 0;
+  margin-top: var(--space-20);
+}
+
+body.light-mode .footer {
+  background-color: var(--bg-secondary);
+  border-top-color: var(--border-primary);
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-8);
+}
+
+.footer-section h4 {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section li {
+  margin-bottom: var(--space-2);
+}
+
+.footer-section a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.footer-section a:hover {
+  color: var(--accent-primary);
+}
+
+/* Responsive Layout */
+@media (max-width: 1024px) {
+  .hands-on-container,
+  .labs-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    overflow: visible;
+  }
+
+  .lab-nav {
+    position: static;
+    max-height: none;
+    margin-bottom: var(--space-6);
+  }
+
+  .lab-nav-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-12) 0;
+  }
+
+  .hero {
+    padding: var(--space-16) 0 var(--space-12) 0;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .workshop-overview {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .resources-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--space-3);
+  }
+
+  .lab-content {
+    padding: var(--space-4);
+  }
+}

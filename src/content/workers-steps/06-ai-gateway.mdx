@@ -1,0 +1,499 @@
+---
+title: "AI Gateway Integration"
+description: "Learn to use AI Gateway for managing, monitoring, and securing AI model requests. Build intelligent applications with request analytics and caching."
+stepNumber: 6
+duration: "35 min"
+difficulty: "intermediate"
+tags: ["ai-gateway", "monitoring", "caching", "analytics", "ai-management"]
+prerequisites: ["Completed Step 5", "Workers AI understanding", "Basic knowledge of API management"]
+learningObjectives: [
+  "Create and configure AI Gateway for request management",
+  "Implement AI Gateway with Workers AI integration",
+  "Monitor AI usage with analytics and logging",
+  "Optimize AI requests with caching and rate limiting"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+import StepNavigation from '../../components/StepNavigation.astro';
+
+<Callout type="globe" title="AI Gateway Overview">
+AI Gateway provides a unified interface to manage, monitor, and secure your AI model requests across different providers with built-in analytics, caching, and rate limiting.
+
+- **Request Management:** Route and manage AI requests efficiently
+- **Analytics & Monitoring:** Track usage, costs, and performance metrics
+- **Caching:** Reduce costs and latency with intelligent response caching
+- **Rate Limiting:** Control and protect your AI usage with request limits
+</Callout>
+
+## Step 1: Create Your AI Gateway
+
+<StepObjective 
+  what="An AI Gateway configured to manage and monitor your Workers AI requests with analytics enabled."
+  why="AI Gateway provides essential observability and control over AI model usage, helping optimize costs and performance."
+/>
+
+### 📝 Create Gateway via Dashboard
+
+1. **Navigate to AI Gateway:**
+   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
+   - Select **AI** > **AI Gateway**
+   - Click **Create Gateway**
+
+2. **Configure Gateway:**
+   - **Gateway Name:** `my-ai-gateway`
+   - Click **Create**
+
+3. **Get Gateway Endpoint:**
+   - Select your newly created gateway
+   - Choose **Workers AI** as provider
+   - Copy the endpoint URL (you'll need this later)
+
+### 📝 Alternative: Create via API
+
+```bash
+# Get your Account ID and create API token first
+curl -X POST "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai-gateway/gateways" \
+  -H "Authorization: Bearer {api_token}" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "my-ai-gateway"}'
+```
+
+## Step 2: Configure Worker with AI Gateway
+
+<StepObjective 
+  what="A Worker that routes AI requests through AI Gateway for monitoring and management."
+  why="Integration with AI Gateway provides request analytics, caching, and centralized AI model management."
+/>
+
+### 📝 Update Wrangler Configuration
+
+Update your `wrangler.jsonc`:
+
+```json
+{
+  "name": "ai-gateway-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2024-01-01",
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    "GATEWAY_ACCOUNT_ID": "your-account-id",
+    "GATEWAY_ID": "my-ai-gateway"
+  }
+}
+```
+
+### 📝 Create AI Gateway Worker
+
+Create `src/index.js`:
+
+```typescript
+interface ChatRequest {
+  message: string;
+  model?: string;
+}
+
+interface ChatResponse {
+  response: string;
+  model: string;
+  cached: boolean;
+}
+
+interface SummarizeRequest {
+  text: string;
+  maxLength?: number;
+}
+
+interface SummarizeResponse {
+  summary: string;
+  originalLength: number;
+  summaryLength: number;
+  cached: boolean;
+}
+
+interface TranslateRequest {
+  text: string;
+  targetLanguage: string;
+  sourceLanguage?: string;
+}
+
+interface TranslateResponse {
+  translation: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  cached: boolean;
+}
+
+interface ErrorResponse {
+  error: string;
+}
+
+interface HealthResponse {
+  status: string;
+  gateway: string;
+}
+
+export interface Env {
+  AI: Ai;
+  GATEWAY_ACCOUNT_ID: string;
+  GATEWAY_ID: string;
+}
+
+type CorsHeaders = Record<string, string>;
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const { pathname } = url;
+    
+    // CORS headers
+    const corsHeaders: CorsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
+
+    try {
+      // Route handling
+      if (pathname === '/chat' && request.method === 'POST') {
+        return await handleChat(request, env, corsHeaders);
+      }
+      
+      if (pathname === '/summarize' && request.method === 'POST') {
+        return await handleSummarize(request, env, corsHeaders);
+      }
+      
+      if (pathname === '/translate' && request.method === 'POST') {
+        return await handleTranslate(request, env, corsHeaders);
+      }
+
+      if (pathname === '/health' && request.method === 'GET') {
+        const healthResponse: HealthResponse = { status: 'healthy', gateway: 'active' };
+        return new Response(JSON.stringify(healthResponse), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      return new Response('Not Found', { status: 404, headers: corsHeaders });
+    } catch (error: any) {
+      console.error('Error:', error);
+      const errorResponse: ErrorResponse = { error: 'Internal Server Error' };
+      return new Response(JSON.stringify(errorResponse), { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+  },
+};
+
+// Chat completion with AI Gateway
+async function handleChat(request: Request, env: Env, corsHeaders: CorsHeaders): Promise<Response> {
+  const { message, model = '@cf/meta/llama-3.1-8b-instruct' }: ChatRequest = await request.json();
+  
+  if (!message) {
+    const errorResponse: ErrorResponse = { error: 'Message is required' };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  // Use AI Gateway for request routing and monitoring
+  const response = await env.AI.run(model, {
+    messages: [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: message }
+    ]
+  }, {
+    gateway: {
+      id: env.GATEWAY_ID,
+      skipCache: false,
+      cacheTtl: 3600 // Cache for 1 hour
+    }
+  });
+
+  const chatResponse: ChatResponse = {
+    response: response.response,
+    model: model,
+    cached: response.cached || false
+  };
+
+  return new Response(JSON.stringify(chatResponse), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+
+// Text summarization with caching
+async function handleSummarize(request: Request, env: Env, corsHeaders: CorsHeaders): Promise<Response> {
+  const { text, maxLength = 100 }: SummarizeRequest = await request.json();
+  
+  if (!text) {
+    const errorResponse: ErrorResponse = { error: 'Text is required' };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const prompt = `Summarize the following text in ${maxLength} words or less:\n\n${text}`;
+  
+  const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+    messages: [{ role: 'user', content: prompt }]
+  }, {
+    gateway: {
+      id: env.GATEWAY_ID,
+      skipCache: false,
+      cacheTtl: 7200 // Cache for 2 hours
+    }
+  });
+
+  const summarizeResponse: SummarizeResponse = {
+    summary: response.response,
+    originalLength: text.length,
+    summaryLength: response.response.length,
+    cached: response.cached || false
+  };
+
+  return new Response(JSON.stringify(summarizeResponse), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+
+// Language translation
+async function handleTranslate(request: Request, env: Env, corsHeaders: CorsHeaders): Promise<Response> {
+  const { text, targetLanguage, sourceLanguage = 'auto' }: TranslateRequest = await request.json();
+  
+  if (!text || !targetLanguage) {
+    const errorResponse: ErrorResponse = { error: 'Text and target language are required' };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const prompt = `Translate the following text to ${targetLanguage}. Only return the translation, no explanations:\n\n${text}`;
+  
+  const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+    messages: [{ role: 'user', content: prompt }]
+  }, {
+    gateway: {
+      id: env.GATEWAY_ID,
+      skipCache: false,
+      cacheTtl: 86400 // Cache for 24 hours
+    }
+  });
+
+  const translateResponse: TranslateResponse = {
+    translation: response.response,
+    sourceLanguage: sourceLanguage,
+    targetLanguage: targetLanguage,
+    cached: response.cached || false
+  };
+
+  return new Response(JSON.stringify(translateResponse), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+```
+
+## Step 3: Test AI Gateway Integration
+
+<StepObjective 
+  what="A working AI Gateway setup with multiple AI endpoints that you can test and monitor."
+  why="Testing ensures proper integration and demonstrates the monitoring capabilities of AI Gateway."
+/>
+
+### 📝 Local Development
+
+```bash
+npx wrangler dev --local
+```
+
+### 📝 Test API Endpoints
+
+```bash
+# Test chat endpoint
+curl -X POST http://localhost:8787/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Explain Cloudflare Workers in simple terms"}'
+
+# Test summarization
+curl -X POST http://localhost:8787/summarize \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Cloudflare Workers is a serverless platform that allows developers to run JavaScript code at the edge, closer to users around the world. This reduces latency and improves performance for web applications. Workers can handle HTTP requests, process data, and integrate with various Cloudflare services like KV storage and D1 databases.", "maxLength": 50}'
+
+# Test translation
+curl -X POST http://localhost:8787/translate \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello, how are you today?", "targetLanguage": "Spanish"}'
+
+# Health check
+curl http://localhost:8787/health
+```
+
+## Step 4: Monitor and Optimize with AI Gateway
+
+<StepObjective 
+  what="Understanding of AI Gateway analytics and optimization features for managing AI usage effectively."
+  why="Monitoring helps optimize costs, performance, and reliability of AI-powered applications."
+/>
+
+### 📝 Deploy and Monitor
+
+1. **Deploy your Worker:**
+   ```bash
+   npx wrangler deploy
+   ```
+
+2. **View Analytics:**
+   - Go to **AI** > **AI Gateway** in Cloudflare Dashboard
+   - Select your gateway (`my-ai-gateway`)
+   - View metrics including:
+     - Request counts and success rates
+     - Response times and latency
+     - Cache hit rates and efficiency
+     - Error rates and types
+     - Token usage and estimated costs
+
+### 📝 Configure Advanced Features
+
+In the AI Gateway dashboard, you can configure:
+
+1. **Rate Limiting:**
+   - Set request limits per minute/hour
+   - Configure different limits for different endpoints
+   - Protect against abuse and control costs
+
+2. **Caching Settings:**
+   - Adjust cache TTL for different request types
+   - Configure cache keys and invalidation rules
+   - Monitor cache hit rates
+
+3. **Logging:**
+   - Enable detailed request/response logging
+   - Configure log retention periods
+   - Export logs for analysis
+
+4. **Alerts:**
+   - Set up notifications for high error rates
+   - Monitor unusual usage patterns
+   - Get alerts for cost thresholds
+
+<Alert type="info">
+**💡 Pro Tip:** Use different cache TTL values for different types of requests. Static content like translations can be cached longer, while dynamic chat responses might need shorter cache times.
+</Alert>
+
+## Step 5: Advanced AI Gateway Patterns
+
+<StepObjective 
+  what="Advanced patterns for using AI Gateway including fallbacks, A/B testing, and cost optimization."
+  why="Production applications need robust patterns for reliability, experimentation, and cost management."
+/>
+
+### 📝 Model Fallback Pattern
+
+```typescript
+interface FallbackChatRequest {
+  message: string;
+}
+
+interface FallbackChatResponse {
+  response?: string;
+  model?: string;
+  fallbackUsed?: boolean;
+  error?: string;
+}
+
+async function handleChatWithFallback(request: Request, env: Env, corsHeaders: CorsHeaders): Promise<Response> {
+  const { message }: FallbackChatRequest = await request.json();
+  
+  const models = [
+    '@cf/meta/llama-3.1-8b-instruct',
+    '@cf/meta/llama-3.1-70b-instruct',
+    '@cf/microsoft/phi-2'
+  ];
+
+  for (const model of models) {
+    try {
+      const response = await env.AI.run(model, {
+        messages: [{ role: 'user', content: message }]
+      }, {
+        gateway: {
+          id: env.GATEWAY_ID,
+          skipCache: false,
+          cacheTtl: 3600
+        }
+      });
+
+      const successResponse: FallbackChatResponse = {
+        response: response.response,
+        model: model,
+        fallbackUsed: model !== models[0]
+      };
+
+      return new Response(JSON.stringify(successResponse), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } catch (error: any) {
+      console.log(`Model ${model} failed, trying next...`);
+      continue;
+    }
+  }
+
+  const errorResponse: FallbackChatResponse = { error: 'All models failed' };
+  return new Response(JSON.stringify(errorResponse), {
+    status: 503,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+```
+
+### 📝 Cost Optimization
+
+```typescript
+// Smart model selection based on request complexity
+function selectModel(message: string): string {
+  const wordCount = message.split(' ').length;
+  const hasComplexQuery = /analyze|explain|detailed|complex/i.test(message);
+  
+  if (wordCount > 100 || hasComplexQuery) {
+    return '@cf/meta/llama-3.1-70b-instruct'; // More capable but expensive
+  }
+  return '@cf/meta/llama-3.1-8b-instruct'; // Faster and cheaper
+}
+```
+
+<Alert type="success">
+**🎉 Congratulations!** You've successfully integrated AI Gateway with Workers AI, enabling comprehensive monitoring, caching, and management of your AI requests. Your applications now have enterprise-grade AI infrastructure with analytics and optimization capabilities.
+</Alert>
+
+## Key Takeaways
+
+- **Centralized Management:** AI Gateway provides unified control over AI requests
+- **Cost Optimization:** Caching and smart routing reduce AI usage costs
+- **Monitoring:** Comprehensive analytics help optimize performance
+- **Reliability:** Fallback patterns and error handling improve robustness
+- **Scalability:** Built-in rate limiting and caching handle traffic spikes
+
+✅ **Fantastic work!** You've mastered AI Gateway integration and monitoring. Ready for the final step - deploying to production!
+
+<StepNavigation 
+  currentStep={6}
+  totalSteps={7}
+  prevStep={{
+    title: "Workers AI Integration",
+    slug: "#step-5"
+  }}
+  nextStep={{
+    title: "Deploy to Production",
+    slug: "#step-7"
+  }}
+/>

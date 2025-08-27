@@ -1,0 +1,212 @@
+---
+title: "Deploy to Production"
+description: "Deploy Workers to production with basic observability and monitoring."
+stepNumber: 7
+duration: "15 min"
+difficulty: "beginner"
+tags: ["deployment", "production", "observability"]
+prerequisites: ["Completed Step 6", "Cloudflare account"]
+learningObjectives: [
+  "Deploy Workers to production",
+  "Set up basic observability and monitoring",
+  "Understand production deployment best practices"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+import StepNavigation from '../../components/StepNavigation.astro';
+
+<Callout type="important" title="Production Deployment">
+Deploying Workers to production involves configuring your Worker for the live environment and setting up basic observability.
+
+- **Production Configuration:** Environment-specific settings
+- **Deployment Process:** Using Wrangler to deploy
+- **Basic Observability:** Monitoring and logging essentials
+</Callout>
+
+## Step 1: Deploy to Production
+
+<StepObjective 
+  what="Deploy your Worker to production and make it accessible via a custom domain."
+  why="Production deployment makes your Worker available to real users and enables you to serve live traffic."
+/>
+
+### Deploy Your Worker
+
+```bash title="Deploy to Production"
+# Deploy to production
+wrangler deploy
+
+# Deploy with custom name
+wrangler deploy --name my-production-worker
+
+# Deploy to specific environment
+wrangler deploy --env production
+```
+
+### Production Configuration
+
+```json title="wrangler.jsonc - Production Setup"
+{
+  "name": "my-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-01-01",
+  "routes": [
+    { "pattern": "api.example.com/*", "zone_name": "example.com" }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
+```
+
+### Custom Domain Setup
+
+```bash title="Add Custom Domain"
+# Add a route to your domain
+wrangler route add "api.yourdomain.com/*" my-worker
+
+# Or configure in wrangler.jsonc
+```
+
+<Callout type="tip" title="Domain Requirements">
+To use a custom domain:
+
+- **Domain on Cloudflare:** Your domain must be managed by Cloudflare
+- **DNS Setup:** Ensure proper DNS records are configured
+- **SSL Certificate:** Cloudflare provides automatic SSL certificates
+</Callout>
+
+## Step 2: Basic Observability
+
+<StepObjective 
+  what="Set up basic logging and monitoring to track your Worker's performance and errors."
+  why="Observability helps you understand how your Worker is performing and quickly identify issues in production."
+/>
+
+### Simple Logging
+
+```typescript title="Basic Logging Setup"
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const startTime = Date.now();
+    
+    try {
+      // Log incoming request
+      console.log('Request:', {
+        url: request.url,
+        method: request.method,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Your request handling logic
+      const response = new Response('Hello from production!');
+      
+      // Log response
+      console.log('Response:', {
+        status: response.status,
+        duration: Date.now() - startTime
+      });
+      
+      return response;
+      
+    } catch (error: any) {
+      // Log errors
+      console.error('Error:', {
+        message: error.message,
+        stack: error.stack,
+        url: request.url
+      });
+      
+      return new Response('Internal Server Error', { status: 500 });
+    }
+  }
+};
+```
+
+### View Logs and Analytics
+
+```bash title="Monitor Your Worker"
+# View real-time logs
+wrangler tail
+
+# View logs for specific Worker
+wrangler tail my-worker
+
+# Filter logs by status
+wrangler tail --status error
+```
+
+<Callout type="tip" title="Cloudflare Dashboard">
+Access comprehensive analytics in the Cloudflare Dashboard:
+
+- **Workers Analytics:** Request volume, error rates, and performance metrics
+- **Real-time Logs:** View logs with filtering and search capabilities  
+- **Performance Insights:** CPU usage, memory consumption, and response times
+- **Error Tracking:** Detailed error logs and stack traces
+</Callout>
+
+## Step 3: Testing Your Deployment
+
+<StepObjective 
+  what="Test your production deployment to ensure it's working correctly."
+  why="Testing verifies that your Worker is properly deployed and accessible to users."
+/>
+
+### Test Your Worker
+
+```bash title="Test Production Deployment"
+# Test your Worker URL
+curl https://my-worker.your-subdomain.workers.dev
+
+# Test with different HTTP methods
+curl -X POST https://my-worker.your-subdomain.workers.dev/api/test
+
+# Test custom domain (if configured)
+curl https://api.yourdomain.com/test
+```
+
+### Check Deployment Status
+
+```bash title="Verify Deployment"
+# List your deployed Workers
+wrangler list
+
+# Get Worker details
+wrangler status my-worker
+
+# Check recent deployments
+wrangler deployments list
+```
+
+<Callout type="important" title="Production Checklist">
+Before going live:
+
+- ✅ **Worker deployed successfully**
+- ✅ **Custom domain configured (if needed)**
+- ✅ **Basic logging implemented**
+- ✅ **Error handling in place**
+- ✅ **Tested all endpoints**
+</Callout>
+
+```bash title="🚀 Production Deployment Complete!"
+✅ Worker deployed to production
+📊 Basic observability configured  
+🌍 Ready to serve global traffic!
+```
+
+🎉 **Congratulations!** You've completed the entire Cloudflare Workers workshop! You now have the skills to build production-ready serverless applications with database integration, AI capabilities, and enterprise-grade monitoring.
+
+<StepNavigation 
+  currentStep={7}
+  totalSteps={7}
+  prevStep={{
+    title: "AI Gateway Integration",
+    slug: "#step-6"
+  }}
+/>

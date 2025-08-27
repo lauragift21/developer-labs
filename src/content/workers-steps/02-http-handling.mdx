@@ -1,0 +1,329 @@
+---
+title: "HTTP Request Handling"
+description: "Learn how to handle HTTP requests in Cloudflare Workers using the fetch handler, parse URLs, and work with different HTTP methods."
+stepNumber: 2
+duration: "30 min"
+difficulty: "intermediate"
+tags: ["http", "fetch", "request", "response", "routing"]
+prerequisites: ["Completed Step 1", "Worker project created", "Wrangler CLI installed"]
+learningObjectives: [
+  "Understand the Workers fetch handler",
+  "Parse and work with Request objects",
+  "Handle different HTTP methods",
+  "Create dynamic responses based on URL paths"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+import StepNavigation from '../../components/StepNavigation.astro';
+
+<Callout type="note" title="Understanding HTTP in Workers">
+Cloudflare Workers use the fetch handler to process incoming HTTP requests. Every request is passed as a Request object, and you must return a Response object.
+
+- **Request Object:** Contains URL, headers, method, and body
+- **Response Object:** Your Worker's reply with status, headers, and content
+- **URL Parsing:** Extract paths, query parameters, and routing logic
+- **HTTP Methods:** Handle GET, POST, PUT, DELETE, and more
+</Callout>
+
+## Step 1: Basic Fetch Handler
+
+<StepObjective 
+  what="A Worker that handles HTTP requests and returns different responses based on the request."
+  why="The fetch handler is the foundation of all HTTP processing in Workers - understanding it is essential for building web applications."
+/>
+
+### 📝 Instructions:
+1. Open your Worker project from Step 1
+2. Navigate to `src/index.ts`
+3. Replace the existing code with a more comprehensive fetch handler
+
+```typescript
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    // Get the URL from the request
+    const url = new URL(request.url);
+    
+    // Basic routing based on pathname
+    if (url.pathname === '/') {
+      return new Response('Welcome to my Worker!', {
+        headers: { 'Content-Type': 'text/plain' }
+      });
+    }
+    
+    if (url.pathname === '/hello') {
+      return new Response('Hello, World!', {
+        headers: { 'Content-Type': 'text/plain' }
+      });
+    }
+    
+    // Return 404 for unknown paths
+    return new Response('Not Found', { 
+      status: 404,
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  }
+};
+```
+
+<Callout type="note" title="Understanding the Parameters">
+The fetch handler receives three parameters:
+- **request:** The incoming HTTP request object
+- **env:** Environment variables and bindings
+- **ctx:** Context object with waitUntil and passThroughOnException methods
+</Callout>
+
+## Step 2: Handle Different HTTP Methods
+
+<StepObjective 
+  what="A Worker that responds differently to GET, POST, PUT, and DELETE requests."
+  why="Real applications need to handle various HTTP methods for different operations like reading data (GET) and creating resources (POST)."
+/>
+
+Update your Worker to handle different HTTP methods:
+
+```typescript
+interface ApiResponse {
+  message: string;
+  timestamp: string;
+  received?: string;
+}
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const method = request.method;
+    
+    // Handle different paths and methods
+    if (url.pathname === '/api/data') {
+      switch (method) {
+        case 'GET':
+          const getResponse: ApiResponse = {
+            message: 'Getting data',
+            timestamp: new Date().toISOString()
+          };
+          return new Response(JSON.stringify(getResponse), {
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+        case 'POST':
+          // Read the request body
+          const body = await request.text();
+          const postResponse: ApiResponse = {
+            message: 'Data received',
+            received: body,
+            timestamp: new Date().toISOString()
+          };
+          return new Response(JSON.stringify(postResponse), {
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+        case 'PUT':
+          const putResponse: ApiResponse = {
+            message: 'Data updated',
+            timestamp: new Date().toISOString()
+          };
+          return new Response(JSON.stringify(putResponse), {
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+        case 'DELETE':
+          const deleteResponse: ApiResponse = {
+            message: 'Data deleted',
+            timestamp: new Date().toISOString()
+          };
+          return new Response(JSON.stringify(deleteResponse), {
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+        default:
+          return new Response('Method not allowed', { 
+            status: 405,
+            headers: { 'Allow': 'GET, POST, PUT, DELETE' }
+          });
+      }
+    }
+    
+    // Default response
+    return new Response('Worker is running!', {
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  }
+};
+```
+
+## Step 3: URL Parameters and Query Strings
+
+<StepObjective 
+  what="A Worker that extracts and uses URL parameters and query strings to create dynamic responses."
+  why="Dynamic routing and parameter extraction are essential for building flexible APIs and web applications."
+/>
+
+Add URL parameter handling to your Worker:
+
+```typescript
+interface SearchResponse {
+  query: string;
+  limit: number;
+  results: string;
+}
+
+interface ErrorResponse {
+  error: string;
+}
+
+interface UserResponse {
+  message: string;
+  userId: string;
+  method: string;
+}
+
+interface HeadersResponse {
+  message: string;
+  headers: Record<string, string>;
+}
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+    
+    // Handle query parameters
+    if (pathname === '/search') {
+      const query = url.searchParams.get('q');
+      const limit = url.searchParams.get('limit') || '10';
+      
+      if (!query) {
+        const errorResponse: ErrorResponse = {
+          error: 'Missing query parameter "q"'
+        };
+        return new Response(JSON.stringify(errorResponse), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      
+      const searchResponse: SearchResponse = {
+        query: query,
+        limit: parseInt(limit),
+        results: `Searching for "${query}" with limit ${limit}`
+      };
+      return new Response(JSON.stringify(searchResponse), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // Handle path parameters (simple pattern matching)
+    const userMatch = pathname.match(/^\/users\/(.+)$/);
+    if (userMatch) {
+      const userId = userMatch[1];
+      const userResponse: UserResponse = {
+        message: `User profile for ${userId}`,
+        userId: userId,
+        method: request.method
+      };
+      return new Response(JSON.stringify(userResponse), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // Handle request headers
+    if (pathname === '/headers') {
+      const headers: Record<string, string> = {};
+      for (const [key, value] of request.headers) {
+        headers[key] = value;
+      }
+      
+      const headersResponse: HeadersResponse = {
+        message: 'Your request headers',
+        headers: headers
+      };
+      return new Response(JSON.stringify(headersResponse), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    return new Response('Not Found', { status: 404 });
+  }
+};
+```
+
+## Step 4: Test Your Worker
+
+<StepObjective 
+  what="A complete testing workflow to verify all HTTP handling features work correctly."
+  why="Testing ensures your Worker handles different request types properly before deployment."
+/>
+
+### Testing Process
+
+```bash
+# Start local development server
+npx wrangler dev
+
+# Your Worker will be available at http://localhost:8787
+```
+
+### 🧪 Test These Endpoints:
+
+1. **Basic Routes:**
+   - `GET http://localhost:8787/` - Should return "Worker is running!"
+   - `GET http://localhost:8787/nonexistent` - Should return 404
+
+2. **HTTP Methods:**
+   - `GET http://localhost:8787/api/data` - Returns JSON with timestamp
+   - `POST http://localhost:8787/api/data` - Send data in request body
+   - `PUT http://localhost:8787/api/data` - Returns update confirmation
+   - `DELETE http://localhost:8787/api/data` - Returns deletion confirmation
+
+3. **Query Parameters:**
+   - `GET http://localhost:8787/search?q=cloudflare&limit=5`
+   - `GET http://localhost:8787/search` - Should return error for missing query
+
+4. **Path Parameters:**
+   - `GET http://localhost:8787/users/john` - Returns user profile for "john"
+   - `GET http://localhost:8787/users/123` - Returns user profile for "123"
+
+5. **Headers:**
+   - `GET http://localhost:8787/headers` - Returns all request headers
+
+### Using curl for Testing:
+
+```bash
+# Test GET request
+curl http://localhost:8787/api/data
+
+# Test POST request with data
+curl -X POST http://localhost:8787/api/data -d "Hello from curl"
+
+# Test with query parameters
+curl "http://localhost:8787/search?q=workers&limit=3"
+
+# Test path parameters
+curl http://localhost:8787/users/alice
+```
+
+<Callout type="note" title="What You Should See">
+- **JSON Responses:** Properly formatted JSON with timestamps
+- **Status Codes:** 200 for success, 404 for not found, 405 for wrong method
+- **Dynamic Content:** Responses change based on URL parameters and request data
+- **Header Handling:** Request headers are properly parsed and returned
+</Callout>
+
+✅ **Great work!** You've mastered HTTP request handling in Workers. Ready to add persistent storage with Workers KV in Step 3!
+
+<StepNavigation 
+  currentStep={2}
+  totalSteps={7}
+  prevStep={{
+    title: "Getting Started with Cloudflare Workers",
+    slug: "#step-1"
+  }}
+  nextStep={{
+    title: "Workers KV Storage",
+    slug: "#step-3"
+  }}
+/>

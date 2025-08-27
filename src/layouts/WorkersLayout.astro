@@ -1,0 +1,137 @@
+---
+interface Props {
+	title: string;
+	description?: string;
+	image?: string;
+	url?: string;
+}
+
+const { 
+	title, 
+	description = "Learn to build serverless applications at the edge with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+	image = "/og-image.png",
+	url = "https://developer-labs.pages.dev/labs/workers"
+} = Astro.props;
+
+const fullTitle = title === "Workers Lab" ? "Workers Lab - Build a serverless application at the edge with Cloudflare Workers" : `${title} | Workers Lab`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		
+		<!-- Primary Meta Tags -->
+		<title>{fullTitle}</title>
+		<meta name="title" content={fullTitle} />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+		<meta name="author" content="Cloudflare" />
+		<meta name="keywords" content="Cloudflare Workers, serverless, edge computing, tutorial, hands-on labs, API integration" />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={url} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={image} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:site_name" content="Cloudflare Labs" />
+		<meta property="og:locale" content="en_US" />
+		
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={url} />
+		<meta property="twitter:title" content={fullTitle} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={image} />
+		<meta property="twitter:creator" content="@cloudflare" />
+		<meta property="twitter:site" content="@cloudflare" />
+		
+		<!-- Additional Meta Tags -->
+		<meta name="theme-color" content="#f38020" />
+		<meta name="msapplication-TileColor" content="#f38020" />
+		<meta name="application-name" content="Cloudflare Labs" />
+		
+		<!-- Canonical URL -->
+		<link rel="canonical" href={url} />
+		
+		<!-- Favicon and Icons -->
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
+		<link rel="manifest" href="/assets/site.webmanifest" />
+		
+		<!-- Lab Stylesheets -->
+		<link rel="stylesheet" href="/assets/css/main.css">
+		<link rel="stylesheet" href="/assets/css/step-content-overflow.css">
+		
+		<!-- Preconnect for performance -->
+		<link rel="preconnect" href="https://www.cloudflare.com" />
+		
+		<!-- Generator -->
+		<meta name="generator" content={Astro.generator} />
+		
+		<!-- Structured Data -->
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "Course",
+			"name": "Workers Lab - Build a serverless application at the edge with Cloudflare Workers",
+			"description": "Learn to build serverless applications at the edge with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+			"provider": {
+				"@type": "Organization",
+				"name": "Cloudflare",
+				"url": "https://cloudflare.com"
+			},
+			"educationalLevel": "Intermediate",
+			"teaches": [
+				"Cloudflare Workers",
+				"Cloudflare Workers AI",
+				"Cloudflare KV",
+				"Cloudflare D1",
+				"API Integration"
+			],
+			"url": "https://developer-labs.pages.dev/labs/workers",
+			"image": "/og-image.png"
+		}
+		</script>
+	</head>
+	<body>
+		<slot />
+	<script type="module" src="/assets/workers/app.js"></script>
+	</body>
+</html>
+<style is:global>
+	:root {
+		--accent: 136, 58, 234;
+		--accent-light: 224, 204, 250;
+		--accent-dark: 49, 10, 101;
+		--accent-gradient: linear-gradient(
+			45deg,
+			rgb(var(--accent)),
+			rgb(var(--accent-light)) 30%,
+			white 60%
+		);
+	}
+	html {
+		font-family: system-ui, sans-serif;
+		background: #13151a;
+		background-size: 224px;
+	}
+	code {
+		font-family:
+			Menlo,
+			Monaco,
+			Lucida Console,
+			Liberation Mono,
+			DejaVu Sans Mono,
+			Bitstream Vera Sans Mono,
+			Courier New,
+			monospace;
+	}
+</style>

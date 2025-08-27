@@ -1,0 +1,193 @@
+---
+export interface Props {
+  language?: string;
+  title?: string;
+  filename?: string;
+  showLineNumbers?: boolean;
+  highlightLines?: string;
+  class?: string;
+}
+
+const {
+  language = 'text',
+  title,
+  filename,
+  showLineNumbers = false,
+  highlightLines = '',
+  class: className = '',
+} = Astro.props;
+---
+
+<div class={`code-block-wrapper ${className}`}>
+  {(title || filename) ? (
+    <div class='code-block-header'>
+      {filename ? <span class='code-filename'>{filename}</span> : null}
+      {title ? <span class='code-title'>{title}</span> : null}
+      <span class='code-language'>{language}</span>
+    </div>
+  ) : null}
+  <div class='code-block' data-language={language}>
+    <pre class={showLineNumbers ? 'line-numbers' : ''}><code class={`language-${language}`}><slot /></code></pre>
+  </div>
+</div>
+
+<style>
+  .code-block-wrapper {
+    margin: 1.5rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #e5e7eb);
+    background: var(--code-bg, #f8fafc);
+  }
+
+  .code-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--header-bg, #f1f5f9);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    font-size: 1rem;
+  }
+
+  .code-filename {
+    font-weight: 600;
+    color: var(--text-primary, #1f2937);
+  }
+
+  .code-title {
+    font-weight: 500;
+    color: var(--text-secondary, #6b7280);
+  }
+
+  .code-language {
+    background: var(--lang-bg, #e2e8f0);
+    color: var(--lang-text, #475569);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .code-block {
+    position: relative;
+  }
+
+  pre {
+    margin: 0;
+    padding: 1rem;
+    overflow-x: auto;
+    background: transparent;
+    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  code {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-family: inherit;
+  }
+
+  /* Line numbers */
+  .line-numbers {
+    counter-reset: line-number;
+  }
+
+  .line-numbers code {
+    counter-increment: line-number;
+  }
+
+  .line-numbers code::before {
+    content: counter(line-number);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3rem;
+    text-align: right;
+    padding-right: 1rem;
+    color: var(--line-number-color, #9ca3af);
+    user-select: none;
+  }
+
+  .line-numbers pre {
+    padding-left: 4rem;
+  }
+
+  /* Light theme support */
+  body.light-mode .code-block-wrapper {
+    --border-color: #e5e7eb;
+    --code-bg: #f8fafc;
+  }
+
+  body.light-mode .code-block-header {
+    --header-bg: #f1f5f9;
+    --border-color: #e5e7eb;
+  }
+
+  body.light-mode .code-filename {
+    --text-primary: #1f2937;
+  }
+
+  body.light-mode .code-title {
+    --text-secondary: #6b7280;
+  }
+
+  body.light-mode .code-language {
+    --lang-bg: #e2e8f0;
+    --lang-text: #475569;
+  }
+
+  body.light-mode .line-numbers code::before {
+    --line-number-color: #9ca3af;
+  }
+
+  body.light-mode pre {
+    color: #1f2937;
+  }
+
+  body.light-mode code {
+    color: #1f2937;
+  }
+
+  /* Dark theme support */
+  @media (prefers-color-scheme: dark) {
+    .code-block-wrapper {
+      --border-color: #374151;
+      --code-bg: #1f2937;
+    }
+
+    .code-block-header {
+      --header-bg: #111827;
+      --border-color: #374151;
+    }
+
+    .code-filename {
+      --text-primary: #f9fafb;
+    }
+
+    .code-title {
+      --text-secondary: #d1d5db;
+    }
+
+    .code-language {
+      --lang-bg: #374151;
+      --lang-text: #d1d5db;
+    }
+
+    .line-numbers code::before {
+      --line-number-color: #6b7280;
+    }
+  }
+
+  /* Copy button integration */
+  .code-block {
+    position: relative;
+  }
+
+  .code-block:hover .copy-button {
+    opacity: 1;
+  }
+</style>

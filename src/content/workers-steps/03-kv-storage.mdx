@@ -1,0 +1,456 @@
+---
+title: "Workers KV Storage"
+description: "Learn to use Cloudflare Workers KV for persistent data storage. Build a simple key-value API with global, low-latency storage."
+stepNumber: 3
+duration: "35 min"
+difficulty: "intermediate"
+tags: ["storage", "kv", "persistence", "database", "stateful"]
+prerequisites: ["Completed Step 2", "Worker project running", "Understanding of key-value storage"]
+learningObjectives: [
+  "Create and configure Cloudflare KV namespaces",
+  "Implement CRUD operations with KV storage",
+  "Handle storage operations and errors",
+  "Build stateful applications with persistent data"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+import StepNavigation from '../../components/StepNavigation.astro';
+
+<Callout type="note" title="Persistent Storage with KV">
+Cloudflare Workers KV provides global, low-latency key-value storage that's perfect for configuration, user preferences, and caching data.
+
+- **Global Distribution:** Data replicated across Cloudflare's network
+- **Eventually Consistent:** Fast reads with eventual consistency
+- **Generous Limits:** 1GB storage and 100,000 operations daily on free tier
+- **Simple API:** Easy key-value operations (get, put, delete, list)
+</Callout>
+
+## Step 1: Create KV Namespace
+
+<StepObjective 
+  what="A KV namespace that provides persistent, globally distributed storage for your Worker."
+  why="KV storage enables stateful applications where data persists between requests and user sessions."
+/>
+
+```bash
+# Create a new KV namespace for our Worker
+npx wrangler kv namespace create "USER_DATA"
+```
+
+### Setup Process:
+1. Run the command to create a new KV namespace
+2. Copy the namespace ID from the output
+3. Note both the binding name and ID for configuration
+4. Keep this terminal output for the next step
+
+### Expected Output:
+```bash
+✅ Success! Created KV namespace "USER_DATA"
+📋 Add the following to your wrangler.jsonc file:
+🔧 { binding = "USER_DATA", id = "abc1234567890defghij" }
+```
+
+## Step 2: Configure KV Binding
+
+<StepObjective 
+  what="Worker configuration that binds the KV namespace to your Worker, making it accessible via the USER_DATA binding."
+  why="Bindings connect external resources to your Worker, allowing secure access to KV storage from your code."
+/>
+
+Add the KV namespace to your `wrangler.jsonc` file:
+
+```json
+{
+  "name": "my-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-01-01",
+  "kv_namespaces": [
+    {
+      "binding": "USER_DATA",
+      "id": "your-actual-namespace-id-here"
+    }
+  ]
+}
+```
+
+### ⚙️ Configuration Steps:
+1. Open your `wrangler.jsonc` file
+2. Add the `kv_namespaces` array if it doesn't exist
+3. Replace the ID with your actual namespace ID from Step 1
+4. Save the file
+
+<Callout type="important" title="Binding Names">
+The `binding` name (USER_DATA) is how you'll access the KV namespace in your code via `env.USER_DATA`. Choose descriptive names for your bindings.
+</Callout>
+
+## Step 3: Basic KV Operations
+
+<StepObjective 
+  what="A Worker that demonstrates all basic KV operations: create, read, update, delete, and list."
+  why="Understanding CRUD operations is essential for building applications with persistent data storage."
+/>
+
+```typescript
+interface KVListResponse {
+  keys: string[];
+  count: number;
+}
+
+interface KVGetResponse {
+  key: string;
+  value: string;
+}
+
+interface KVOperationResponse {
+  message: string;
+  key: string;
+}
+
+interface KVErrorResponse {
+  error: string;
+  message: string;
+}
+
+export interface Env {
+  USER_DATA: KVNamespace;
+}
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const method = request.method;
+    
+    // Handle different KV operations based on URL path
+    if (url.pathname.startsWith('/kv/')) {
+      const key = url.pathname.split('/kv/')[1];
+      
+      if (!key && method !== 'GET') {
+        return new Response('Key is required', { status: 400 });
+      }
+      
+      try {
+        switch (method) {
+          case 'GET':
+            if (!key) {
+              // List all keys
+              const keys = await env.USER_DATA.list();
+              const listResponse: KVListResponse = {
+                keys: keys.keys.map(k => k.name),
+                count: keys.keys.length
+              };
+              return new Response(JSON.stringify(listResponse), {
+                headers: { 'Content-Type': 'application/json' }
+              });
+            } else {
+              // Get specific key
+              const value = await env.USER_DATA.get(key);
+              if (value === null) {
+                return new Response('Key not found', { status: 404 });
+              }
+              const getResponse: KVGetResponse = { key, value };
+              return new Response(JSON.stringify(getResponse), {
+                headers: { 'Content-Type': 'application/json' }
+              });
+            }
+            
+          case 'POST':
+          case 'PUT':
+            // Store/update key-value pair
+            const body = await request.text();
+            await env.USER_DATA.put(key, body);
+            const storeResponse: KVOperationResponse = {
+              message: 'Value stored successfully',
+              key: key
+            };
+            return new Response(JSON.stringify(storeResponse), {
+              status: 201,
+              headers: { 'Content-Type': 'application/json' }
+            });
+            
+          case 'DELETE':
+            // Delete key
+            await env.USER_DATA.delete(key);
+            const deleteResponse: KVOperationResponse = {
+              message: 'Key deleted successfully',
+              key: key
+            };
+            return new Response(JSON.stringify(deleteResponse), {
+              headers: { 'Content-Type': 'application/json' }
+            });
+            
+          default:
+            return new Response('Method not allowed', { status: 405 });
+        }
+      } catch (error: any) {
+        const errorResponse: KVErrorResponse = {
+          error: 'KV operation failed',
+          message: error.message
+        };
+        return new Response(JSON.stringify(errorResponse), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+    
+    return new Response('KV Storage API - Use /kv/{key} endpoints');
+  }
+};
+```
+
+<Callout type="tip" title="Understanding the Code">
+This Worker implements a REST API for KV operations:
+- `GET /kv/` - Lists all keys
+- `GET /kv/{key}` - Retrieves a specific value
+- `POST/PUT /kv/{key}` - Stores/updates a value
+- `DELETE /kv/{key}` - Deletes a key-value pair
+</Callout>
+
+## Step 4: Advanced KV Features
+
+<StepObjective 
+  what="A Worker that uses advanced KV features like metadata, expiration, and efficient list operations."
+  why="Production applications need advanced features for better performance and data management."
+/>
+
+```typescript
+interface UserPreferences {
+  theme?: string;
+  language?: string;
+  [key: string]: any;
+}
+
+interface PreferencesMetadata {
+  userId: string;
+  lastModified: string;
+  version: number;
+}
+
+interface PreferencesGetResponse {
+  preferences: UserPreferences;
+  metadata: PreferencesMetadata | null;
+  lastModified?: string;
+}
+
+interface PreferencesSaveResponse {
+  message: string;
+  userId: string;
+}
+
+interface UsersListResponse {
+  users: string[];
+  count: number;
+}
+
+interface ErrorResponse {
+  error: string;
+  message: string;
+}
+
+export interface Env {
+  USER_DATA: KVNamespace;
+}
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const method = request.method;
+    
+    // User preferences endpoint with metadata
+    if (url.pathname === '/preferences') {
+      const userId = url.searchParams.get('user');
+      
+      if (!userId) {
+        return new Response('User ID required', { status: 400 });
+      }
+      
+      const key = `user:${userId}:preferences`;
+      
+      try {
+        switch (method) {
+          case 'GET':
+            // Get with metadata
+            const result = await env.USER_DATA.getWithMetadata<PreferencesMetadata>(key);
+            if (result.value === null) {
+              const emptyResponse: PreferencesGetResponse = {
+                preferences: {},
+                metadata: null
+              };
+              return new Response(JSON.stringify(emptyResponse), {
+                headers: { 'Content-Type': 'application/json' }
+              });
+            }
+            
+            const getResponse: PreferencesGetResponse = {
+              preferences: JSON.parse(result.value) as UserPreferences,
+              metadata: result.metadata,
+              lastModified: result.metadata?.lastModified
+            };
+            return new Response(JSON.stringify(getResponse), {
+              headers: { 'Content-Type': 'application/json' }
+            });
+            
+          case 'POST':
+            const preferences: UserPreferences = await request.json();
+            
+            // Store with metadata and expiration (30 days)
+            const metadata: PreferencesMetadata = {
+              userId: userId,
+              lastModified: new Date().toISOString(),
+              version: 1
+            };
+            
+            await env.USER_DATA.put(key, JSON.stringify(preferences), {
+              metadata,
+              expirationTtl: 30 * 24 * 60 * 60 // 30 days in seconds
+            });
+            
+            const saveResponse: PreferencesSaveResponse = {
+              message: 'Preferences saved',
+              userId: userId
+            };
+            return new Response(JSON.stringify(saveResponse), {
+              status: 201,
+              headers: { 'Content-Type': 'application/json' }
+            });
+            
+          default:
+            return new Response('Method not allowed', { status: 405 });
+        }
+      } catch (error: any) {
+        const errorResponse: ErrorResponse = {
+          error: 'Preferences operation failed',
+          message: error.message
+        };
+        return new Response(JSON.stringify(errorResponse), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+    
+    // List users endpoint with prefix filtering
+    if (url.pathname === '/users') {
+      try {
+        const users = await env.USER_DATA.list({ prefix: 'user:' });
+        const userIds = users.keys
+          .map(key => key.name.split(':')[1])
+          .filter((id, index, arr) => arr.indexOf(id) === index); // Remove duplicates
+        
+        const usersResponse: UsersListResponse = {
+          users: userIds,
+          count: userIds.length
+        };
+        return new Response(JSON.stringify(usersResponse), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (error: any) {
+        const errorResponse: ErrorResponse = {
+          error: 'Failed to list users',
+          message: error.message
+        };
+        return new Response(JSON.stringify(errorResponse), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+    
+    return new Response('Advanced KV API - Use /preferences?user=ID or /users');
+  }
+};
+```
+
+<Callout type="note" title="Advanced Features">
+This implementation demonstrates:
+- **Metadata:** Store additional information with your values
+- **Expiration:** Automatically delete data after a specified time
+- **Prefix filtering:** Efficiently query keys with common prefixes
+- **Structured keys:** Organize data with hierarchical key naming
+</Callout>
+
+## Step 5: Test Your KV Storage
+
+<StepObjective 
+  what="A comprehensive test of all KV storage features to verify functionality."
+  why="Testing ensures your KV operations work correctly and handle edge cases properly."
+/>
+
+### Testing Process
+
+```bash
+# Start your development server
+npx wrangler dev
+
+# Your Worker will be available at http://localhost:8787
+```
+
+### 🧪 Test These Operations:
+
+1. **Store data:**
+   ```bash
+   curl -X POST http://localhost:8787/kv/username -d "john_doe"
+   curl -X POST http://localhost:8787/kv/email -d "john@example.com"
+   ```
+
+2. **Retrieve data:**
+   ```bash
+   curl http://localhost:8787/kv/username
+   curl http://localhost:8787/kv/email
+   ```
+
+3. **List all keys:**
+   ```bash
+   curl http://localhost:8787/kv/
+   ```
+
+4. **Test user preferences:**
+   ```bash
+   # Store preferences
+   curl -X POST "http://localhost:8787/preferences?user=123" \
+     -H "Content-Type: application/json" \
+     -d '{"theme": "dark", "language": "en"}'
+   
+   # Retrieve preferences
+   curl "http://localhost:8787/preferences?user=123"
+   ```
+
+5. **List users:**
+   ```bash
+   curl http://localhost:8787/users
+   ```
+
+6. **Delete data:**
+   ```bash
+   curl -X DELETE http://localhost:8787/kv/username
+   ```
+
+### Expected Results:
+
+- **Storage operations:** Return success messages with 201 status
+- **Retrieval:** Return stored values in JSON format
+- **List operations:** Return arrays of keys or user IDs
+- **Metadata:** Include additional information like timestamps
+- **Error handling:** Graceful responses for missing keys or errors
+
+<Callout type="caution" title="KV Consistency">
+Remember that KV is eventually consistent. Changes may take a few seconds to propagate globally. In local development, changes are typically immediate.
+</Callout>
+
+✅ **Excellent work!** You've learned to use Workers KV for persistent storage with advanced features. Ready for more advanced Workers features in Step 4!
+
+<StepNavigation 
+  currentStep={3}
+  totalSteps={7}
+  prevStep={{
+    title: "HTTP Request Handling",
+    slug: "#step-2"
+  }}
+  nextStep={{
+    title: "D1 Database",
+    slug: "#step-4"
+  }}
+/>

@@ -1,0 +1,157 @@
+---
+export interface Props {
+  type?: 'note' | 'tip' | 'important' | 'caution';
+  title?: string;
+  icon?: string;
+  class?: string;
+}
+
+const { type = 'note', title, icon, class: className = '' } = Astro.props;
+
+const typeConfig = {
+  note: {
+    icon: icon || '📝',
+    title: title || 'Note',
+    class: 'callout-note',
+  },
+  tip: {
+    icon: icon || '💡',
+    title: title || 'Tip',
+    class: 'callout-tip',
+  },
+  important: {
+    icon: icon || '🚀',
+    title: title || 'Important',
+    class: 'callout-important',
+  },
+  caution: {
+    icon: icon || '⚠️',
+    title: title || 'Caution',
+    class: 'callout-caution',
+  },
+  tool: {
+    icon: icon || '🛠️',
+    title: title || 'Tool',
+    class: 'callout-tool',
+  },
+  globe: {
+    icon: icon || '🌐',
+    title: title || 'Globe',
+    class: 'callout-globe',
+  },
+};
+
+const config = typeConfig[type];
+---
+
+<div class={`callout ${config.class} ${className}`}>
+  <div class='callout-header'>
+    <span class='callout-icon'>{config.icon}</span>
+    <span class='callout-title'>{config.title}</span>
+  </div>
+  <div class='callout-content'>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .callout {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-left: 4px solid var(--accent-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    margin: var(--space-4) 0;
+  }
+
+  body.light-mode .callout {
+    background-color: var(--bg-surface);
+    border-color: var(--border-primary);
+  }
+
+  .callout-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .callout-icon {
+    font-size: var(--text-xl);
+    color: var(--accent-primary);
+    font-weight: var(--weight-semibold);
+  }
+
+  .callout-title {
+    color: var(--text-primary);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    margin: 0;
+  }
+
+  .callout-content {
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .callout-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .callout-content :global(ul) {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-3) 0;
+  }
+
+  .callout-content :global(li) {
+    position: relative;
+    padding-left: var(--space-4);
+    margin-bottom: var(--space-2);
+    color: var(--text-secondary);
+  }
+
+  .callout-content :global(li::before) {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent-primary);
+    font-weight: var(--weight-semibold);
+  }
+
+  /* Type-specific left border colors and icons */
+  .callout-note {
+    border-left-color: var(--accent-primary);
+  }
+
+  .callout-caution {
+    border-left-color: #ef4444;
+  }
+
+  .callout-caution .callout-icon {
+    color: #ef4444;
+    --callout-bg: #064e3b;
+    --callout-header-bg: #047857;
+    --callout-title-color: #a7f3d0;
+    --callout-text-color: #d1fae5;
+    --callout-code-bg: #059669;
+  }
+
+  .callout-important {
+    --callout-border: #9a3412;
+    --callout-bg: #92400e;
+    --callout-header-bg: #c2410c;
+    --callout-title-color: #fed7aa;
+    --callout-text-color: #ffedd5;
+    --callout-code-bg: #ea580c;
+  }
+
+  .callout-caution {
+    --callout-border: #991b1b;
+    --callout-bg: #7f1d1d;
+    --callout-header-bg: #b91c1c;
+    --callout-title-color: #fecaca;
+    --callout-text-color: #fee2e2;
+    --callout-code-bg: #dc2626;
+  }
+</style>

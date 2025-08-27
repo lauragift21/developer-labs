@@ -1,0 +1,145 @@
+---
+title: "Building a Persistent Todo App"
+description: "Create a complete CRUD todo application using KV storage. Build tools for adding, listing, completing, and deleting tasks."
+stepNumber: 6
+duration: "45 min"
+difficulty: "advanced"
+tags: ["crud", "application", "persistence", "todo", "kv-storage"]
+prerequisites: ["Completed Step 5", "KV storage configured", "TODO_STORE namespace created"]
+learningObjectives: [
+  "Implement full CRUD operations with KV storage",
+  "Design data structures for complex applications",
+  "Handle concurrent operations and data consistency",
+  "Build user-friendly AI-accessible applications"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+
+<Callout type="note" title="Todo Application Architecture">
+A todo application demonstrates key concepts in building stateful MCP applications with persistent storage.
+
+- **CRUD Operations:** Create, Read, Update, Delete functionality
+- **Data Modeling:** Structured data with timestamps and metadata
+- **Unique IDs:** Generate unique identifiers for tasks
+- **Filtering:** List completed vs pending tasks
+</Callout>
+
+## Step 1: Add Todo Management Tools
+
+<StepObjective 
+  what="Complete CRUD functionality for a todo application with addTodo, listTodos, and completeTodo tools."
+  why="Demonstrates how AI assistants can create and manage persistent, stateful applications users can interact with over time."
+/>
+
+```typescript
+this.server.tool(
+    "addTodo",
+    "Add a new task to your todo list",
+    { task: z.string().describe("Task description") },
+    async ({ task }) => {
+        await this.env.TODO_STORE.put(task, JSON.stringify({
+            completed: false,
+            createdAt: new Date().toISOString()
+        }));
+        return { content: [{ type: "text", text: `Added task: ${task}` }] };
+    }
+);
+
+this.server.tool(
+    "listTodos",
+    "List all tasks in your todo list",
+    {},
+    async () => {
+        const list = await this.env.TODO_STORE.list();
+        const tasks = [];
+        
+        for (const key of list.keys) {
+            const value = await this.env.TODO_STORE.get(key.name);
+            if (value) {
+                const taskData = JSON.parse(value);
+                tasks.push(`${taskData.completed ? '✅' : '📋'} ${key.name}`);
+            }
+        }
+        
+        if (tasks.length === 0) {
+            return { content: [{ type: "text", text: "No tasks found. Add some tasks first!" }] };
+        }
+        
+        return {
+            content: [{
+                type: "text",
+                text: `Todo List:\n${tasks.join('\n')}`
+            }]
+        };
+    }
+);
+
+this.server.tool(
+    "completeTodo",
+    "Mark a task as completed",
+    { task: z.string().describe("Task to mark as completed") },
+    async ({ task }) => {
+        const value = await this.env.TODO_STORE.get(task);
+        if (!value) {
+            return { content: [{ type: "text", text: `Task "${task}" not found` }] };
+        }
+        
+        const taskData = JSON.parse(value);
+        taskData.completed = true;
+        
+        await this.env.TODO_STORE.put(task, JSON.stringify(taskData));
+        return { content: [{ type: "text", text: `Completed task: ${task}` }] };
+    }
+);
+```
+
+<Callout type="note" title="Data Structure Design">
+Each todo item is stored as:
+- **Key:** Task description (unique identifier)
+- **Value:** JSON object with completed status and creation time
+- **Operations:** Create, list, and update completion status
+- **Consistency:** Atomic updates ensure data integrity
+
+</Callout>
+
+<CodeBlock language="bash" title="Todo App Ready">
+
+✅ addTodo tool created
+📋 listTodos tool created  
+✔️ completeTodo tool created
+💾 Persistent todo app functional
+</CodeBlock>
+
+## Step 2: Test the Todo Application
+
+<StepObjective 
+  what="A comprehensive test of all todo functionality to verify persistence and state management works correctly."
+  why="Testing CRUD operations ensures the application maintains state properly across different AI interactions."
+/>
+
+### 🧪 Complete Testing Workflow:
+1. Deploy your updated server: `npm run deploy`
+2. Connect to AI Playground with your deployment URL
+3. Test adding tasks: "Add a task to buy groceries"
+4. Test listing: "Show me my todo list"
+5. Test completion: "Mark 'buy groceries' as completed"
+6. Test persistence: Refresh and list tasks again
+
+<Callout type="note" title="Expected Behavior">
+Your todo app should demonstrate:
+- **Persistence:** Tasks survive page refreshes and new conversations
+- **State Management:** Completion status updates correctly
+- **User Experience:** Natural interaction through AI conversation
+- **Data Integrity:** No duplicate or corrupted entries
+</Callout>
+
+<CodeBlock language="text" title="Todo App Tested">
+✅ Tasks persist across sessions
+📋 List functionality working
+✔️ Completion status updates
+🎉 Stateful AI application complete!
+</CodeBlock>

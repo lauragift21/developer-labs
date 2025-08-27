@@ -1,0 +1,375 @@
+---
+import WorkersLayout from '../../../layouts/WorkersLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all workshop steps
+const workshopSteps = await getCollection('workers-steps');
+
+// Sort workshop steps by step number
+const sortedSteps = workshopSteps.sort((a: any, b: any) => a.data.stepNumber - b.data.stepNumber);
+
+// Render workshop steps with their components
+const processedSteps = await Promise.all(
+  sortedSteps.map(async (step: any) => {
+    const { Content } = await step.render();
+    return {
+      ...step,
+      Content,
+    };
+  })
+);
+---
+
+<WorkersLayout title='Learn Workers'>
+  <main>
+    <!-- Navigation -->
+    <nav class='navbar'>
+      <div class='nav-container'>
+        <div class='nav-logo'>
+          <img
+            src='https://www.cloudflare.com/img/logo-web-badges/cf-logo-on-white-bg.svg'
+            alt='Cloudflare'
+            height='40'
+          />
+          <span>Learn Cloudflare Workers</span>
+        </div>
+        <ul class='nav-menu'>
+          <li><a href='#course-intro' class='nav-link'>Overview</a></li>
+          <li><a href='#fundamentals' class='nav-link'>Fundamentals</a></li>
+          <li><a href='#hands-on' class='nav-link'>Labs</a></li>
+          <li><a href='#resources' class='nav-link'>Resources</a></li>
+          <li>
+            <button id='theme-toggle' class='theme-toggle' aria-label='Toggle dark/light mode'
+              >🌙</button
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Modern Hero Section -->
+    <section id='course-intro' class='hero'>
+      <div class='container'>
+        <div class='hero-content'>
+          <h1 class='hero-title'>Learn Cloudflare Workers</h1>
+          <p class='hero-subtitle'>
+            Build serverless applications at the edge with Cloudflare Workers.
+          </p>
+
+          <div class='hero-buttons'>
+            <a href='#hands-on' class='btn btn-primary'>Start Building →</a>
+            <a href='#resources' class='btn btn-secondary'>View Resources</a>
+          </div>
+        </div>
+
+        <!-- Workshop Overview Cards -->
+        <div class='workshop-overview'>
+          <div class='overview-card'>
+            <h3>What You'll Build</h3>
+            <ul>
+              <li>HTTP APIs with routing</li>
+              <li>KV storage & caching</li>
+              <li>D1 database applications</li>
+              <li>AI-powered Workers</li>
+            </ul>
+          </div>
+
+          <div class='overview-card'>
+            <h3>Prerequisites</h3>
+            <ul>
+              <li>Node.js v18+</li>
+              <li>Cloudflare Account</li>
+              <li>Terminal/Command Line</li>
+              <li>Basic JavaScript knowledge</li>
+            </ul>
+          </div>
+
+          <div class='overview-card'>
+            <h3>Workshop Format</h3>
+            <ul>
+              <li>7 hands-on labs</li>
+              <li>Progressive complexity</li>
+              <li>Deploy to global edge</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workers Fundamentals -->
+    <section id='fundamentals' class='section'>
+      <div class='container'>
+        <h2 class='section-title'>Cloudflare Workers Fundamentals</h2>
+
+        <div class='fundamentals-grid'>
+          <div class='fundamentals-card'>
+            <h3>What is Cloudflare Workers?</h3>
+            <p>
+              Cloudflare Workers is a serverless platform for building, deploying, and scaling applications across Cloudflare's global network with a single command and no infrastructure to manage.
+            </p>
+          </div>
+          
+          <!-- Core Concepts -->
+          <div class='fundamentals-card'>
+            <h4>Core Concepts</h4>
+            <ul>
+              <li>Edge Computing: Code runs at locations closest to users for minimal latency</li>
+              <li>V8 Isolates: Lightweight, secure runtime environment</li>
+              <li>Global Network: Deploy once, run everywhere</li>
+              <li>Serverless: No servers to manage, automatic scaling</li>
+            </ul>
+          </div>
+
+          <div class='fundamentals-card'>
+            <h4>What You'll Build</h4>
+            <ul>
+              <li>HTTP APIs with routing and request handling</li>
+              <li>Key-value storage for user data and caching</li>
+              <li>Database-backed applications with D1 SQL</li>
+              <li>AI-powered features using Workers AI</li>
+              <li>Smart request routing with AI Gateway</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Prerequisites -->
+  <section id='setup' class='section section-alt'>
+    <div class='container'>
+      <h2 class='section-title'>Prerequisites</h2>
+      <p class='intro-text'>Before starting the workshop, ensure you have:</p>
+
+      <div class='prerequisites-grid'>
+        <div class='prereq-item'>
+          <span class='prereq-icon'>💻</span>
+          <div class='prereq-content'>
+            <h4>Node.js v18+</h4>
+            <p>Download from <a href='https://nodejs.org' target='_blank'>nodejs.org</a></p>
+          </div>
+        </div>
+        <div class='prereq-item'>
+          <span class='prereq-icon'>☁️</span>
+          <div class='prereq-content'>
+            <h4>Free Cloudflare Account</h4>
+            <p>
+              <a href='https://dash.cloudflare.com/sign-up' target='_blank'>Sign up here</a> (no credit
+              card needed)
+            </p>
+          </div>
+        </div>
+        <div class='prereq-item'>
+          <span class='prereq-icon'>⚡</span>
+          <div class='prereq-content'>
+            <h4>Wrangler CLI</h4>
+            <p><code is:raw>npm install -g wrangler && wrangler login</code></p>
+          </div>
+        </div>
+        <div class='prereq-item'>
+          <span class='prereq-icon'>🧠</span>
+          <div class='prereq-content'>
+            <h4>Basic JavaScript</h4>
+            <p>Familiarity with Node.js and terminal usage</p>
+          </div>
+        </div>
+      </div>
+
+      <div class='ready-check'>
+        <p><strong>Ready?</strong> Jump into the hands-on workshop below! ⬇️</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workshop Steps -->
+  <section id='hands-on' class='section section-alt'>
+    <div class='container'>
+      <h2 class='section-title'>Workshop Steps</h2>
+
+      <div class='labs-grid'>
+        <!-- Lab Navigation -->
+        <div class='lab-nav'>
+          <span class='nav-label'>WORKSHOP STEPS</span>
+          <div class='lab-nav-items'>
+            {
+              processedSteps.map((step: any, index: number) => (
+                <button
+                  class={`lab-nav-item ${index === 0 ? 'active' : ''}`}
+                  data-step={step.data.stepNumber}
+                >
+                  <span class='lab-number'>{step.data.stepNumber.toString().padStart(2, '0')}</span>
+                  <span class='lab-name'>{step.data.title}</span>
+                  <span class='lab-duration'>{step.data.duration}</span>
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Lab Content -->
+        <div class='lab-content'>
+          {
+            processedSteps.map((step: any, index: number) => (
+              <div
+                class='step-content'
+                id={`step-${step.data.stepNumber}`}
+                style={index === 0 ? '' : 'display: none;'}
+              >
+                <div class='lab-header'>
+                  <span class='lab-label'>
+                    STEP {step.data.stepNumber.toString().padStart(2, '0')}
+                  </span>
+                  <h1>{step.data.title}</h1>
+                  <p class='lab-description'>{step.data.description}</p>
+
+                  {step.data.learningObjectives && (
+                    <div class='learning-objectives'>
+                      <h4>🎯 Learning Objectives</h4>
+                      <ul>
+                        {step.data.learningObjectives.map((objective: string) => (
+                          <li>{objective}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div class='lab-steps'>
+                  <div class='step-content-markdown'>
+                    <step.Content />
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources Section -->
+  <section id='resources' class='section'>
+    <div class='container'>
+      <h2 class='section-title'>Learning Resources</h2>
+      <p class='section-subtitle'>
+        Essential resources for mastering Cloudflare Workers and building serverless applications.
+      </p>
+
+      <div class='resources-grid'>
+        <div class='resource-card'>
+          <h3>📖 Workers Documentation</h3>
+          <p>
+            Official Cloudflare Workers documentation with API references and best practices
+          </p>
+          <a href='https://developers.cloudflare.com/workers/' target='_blank' class='resource-link'
+            >READ DOCS</a
+          >
+        </div>
+
+        <div class='resource-card'>
+          <h3>🎥 Developer Channel</h3>
+          <p>Getting started guides and how-to videos for the Developer Platform and AI tools</p>
+          <a
+            href='https://www.youtube.com/@CloudflareDevelopers'
+            target='_blank'
+            class='resource-link'>WATCH VIDEOS</a
+          >
+        </div>
+
+        <div class='resource-card'>
+          <h3>💬 Community</h3>
+          <p>Open community where users can ask questions and share ideas and solutions</p>
+          <a
+            href='https://community.cloudflare.com/c/developers/39'
+            target='_blank'
+            class='resource-link'>JOIN COMMUNITY</a
+          >
+        </div>
+
+        <div class='resource-card'>
+          <h3>🔧 Cloudflare Workers</h3>
+          <p>Deploy your MCP servers globally with Cloudflare Workers documentation</p>
+          <a href='https://developers.cloudflare.com/workers/' target='_blank' class='resource-link'
+            >WORKERS DOCS</a
+          >
+        </div>
+
+        <div class='resource-card'>
+          <h3>💾 Cloudflare KV</h3>
+          <p>Learn about key-value storage for building persistent MCP applications</p>
+          <a href='https://developers.cloudflare.com/kv/' target='_blank' class='resource-link'
+            >KV DOCS</a
+          >
+        </div>
+
+        <div class='resource-card'>
+          <h3>🤖 Workers AI</h3>
+          <p>Run machine learning models on Cloudflare's global network with Workers AI</p>
+          <a href='https://developers.cloudflare.com/workers-ai/' target='_blank' class='resource-link'
+            >EXPLORE AI</a
+          >
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class='footer'>
+    <div class='container'>
+      <div class='footer-content'>
+        <div class='footer-section'>
+          <h4>Workshop Resources</h4>
+          <ul>
+            <li>
+              <a
+                href='https://github.com/cloudflare/workers-sdk'
+                target='_blank'>Workers SDK</a
+              >
+            </li>
+            <li>
+              <a href='https://developers.cloudflare.com/workers/' target='_blank'>Workers Documentation</a>
+            </li>
+            <li>
+              <a href='https://cloudflare.com/developer-platform/' target='_blank'
+                >Cloudflare Developer Platform</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class='footer-section'>
+          <h4>Get Help</h4>
+          <ul>
+            <li>
+              <a href='https://discord.gg/cloudflaredev' target='_blank'>Developer Discord</a>
+            </li>
+            <li>
+              <a href='https://community.cloudflare.com/c/developers/workers/40' target='_blank'
+                >Community Forum</a
+              >
+            </li>
+            <li>
+              <a href='https://developers.cloudflare.com/support/' target='_blank'
+                >Cloudflare Support</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class='footer-section'>
+          <h4>Share Your Work</h4>
+          <p>
+            Built something amazing? Share it with <strong>#CloudflareWorkers</strong> and connect with the
+            community!
+          </p>
+        </div>
+      </div>
+      <div class='footer-bottom'>
+        <p>
+          &copy; <span id='current-year'></span> Cloudflare, Inc. | Learn Cloudflare Workers Workshop
+        </p>
+      </div>
+    </div>
+  </footer>
+</WorkersLayout>
+
+<!-- JavaScript -->
+<script src='/assets/js/app.js' type='module'></script>

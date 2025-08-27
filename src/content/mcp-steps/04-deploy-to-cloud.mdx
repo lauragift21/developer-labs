@@ -1,0 +1,91 @@
+---
+title: "Deploy to Cloudflare Workers"
+description: "Deploy your MCP server to Cloudflare Workers for global availability and test it with Cloudflare AI Playground."
+stepNumber: 4
+duration: "25 min"
+difficulty: "intermediate"
+tags: ["deployment", "cloudflare", "workers", "production", "ai-playground"]
+prerequisites: ["Completed Step 3", "Cloudflare account", "Wrangler CLI installed"]
+learningObjectives: [
+  "Deploy MCP servers to Cloudflare Workers",
+  "Configure production environment settings",
+  "Test deployed servers with AI Playground",
+  "Monitor and debug production deployments"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+
+<Callout type="tool" title="Global Deployment with Workers">
+Cloudflare Workers deploy your MCP server to a global network of edge locations, providing low-latency access worldwide.
+
+- **Global Network:** Deploy to 200+ cities worldwide
+- **Edge Computing:** Run close to users for minimal latency  
+- **Serverless:** Automatic scaling with zero cold starts
+- **Built-in Security:** DDoS protection and secure by default
+</Callout>
+
+## Step 1: Deploy Your MCP Server
+
+<StepObjective 
+  what="A globally deployed MCP server running on Cloudflare's edge network for low-latency access worldwide."
+  why="Production deployment makes your MCP server accessible to AI assistants and provides real-world testing capabilities."
+/>
+
+### Deployment Process
+
+<CodeBlock language="bash" title="Deploy to Cloudflare Workers">
+// Login to Cloudflare (if not already done)
+wrangler login
+
+// Deploy to Workers
+npm run deploy
+</CodeBlock>
+
+### 🚀 Deployment Process:
+1. Ensure you're logged into Cloudflare with `wrangler login`
+2. Run `npm run deploy` to build and deploy
+3. Wait for deployment to complete (usually 30-60 seconds)
+4. Copy the deployment URL from the output
+5. Note the MCP endpoint: `your-url/mcp`
+
+### Deployment Success
+<CodeBlock language="text" title="Deployment Complete!">
+✅ Worker deployed successfully<br/>
+🌍 Available at: https://my-mcp-server.your-account.workers.dev<br/>
+🔧 MCP endpoint: https://my-mcp-server.your-account.workers.dev/mcp
+</CodeBlock>
+
+## Step 2: Test with AI Playground
+
+<StepObjective 
+  what="A complete integration test using Cloudflare AI Playground to verify your deployed MCP server works with real AI assistants."
+  why="Testing with AI Playground validates that your tools are properly discoverable and functional in a production AI environment."
+/>
+
+### 🎮 AI Playground Testing:
+1. Visit the [Cloudflare AI Playground](https://playground.ai.cloudflare.com/)
+2. Create a new chat session
+3. Click the **"Tools"** button in the interface
+4. Add your MCP server URL: `https://your-worker.workers.dev/mcp`
+5. Click **"Connect"** and verify tools are loaded
+6. Test your tools by asking the AI to use them
+7. Example: "Generate a random number between 1 and 100"
+
+<Callout type="note" title="What You Should See">
+In the AI Playground, you should be able to:
+- **Connect Successfully:** Your MCP server loads without errors
+- **Tool Discovery:** AI can see and understand your tools
+- **Tool Execution:** AI can call your tools and get responses
+- **Natural Integration:** Tools work seamlessly in conversation
+</Callout>
+
+<CodeBlock language="text" title="AI Playground Success">
+✅ MCP server connected to AI Playground
+🎲 AI successfully used randomNumber tool
+🔧 Tools are discoverable and functional
+🌍 Production integration working
+</CodeBlock>

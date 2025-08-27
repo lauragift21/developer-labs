@@ -1,0 +1,139 @@
+---
+title: "Getting Started with MCP Server"
+description: "Set up a functional MCP server using Cloudflare Workers. Understand basic MCP server structure and test MCP tools using the inspector interface."
+stepNumber: 1
+duration: "20 min"
+difficulty: "beginner"
+tags: ["setup", "cloudflare", "workers", "mcp", "inspector"]
+prerequisites: ["Node.js v18+", "Cloudflare Account", "Terminal/Command Line", "Basic JavaScript knowledge"]
+learningObjectives: [
+  "Set up a functional MCP server with Cloudflare Workers",
+  "Understand MCP server basic structure and architecture",
+  "Test MCP tools using the official inspector interface",
+  "Troubleshoot common connection and setup issues"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+
+<Callout type="tool" title="Understanding MCP (Model Context Protocol)">
+MCP is an open standard that enables AI assistants to connect to external tools and data sources. Think of it as a universal interface that lets AI systems perform actions beyond their training - like reading files, calling APIs, or managing databases.
+
+- **Server-Client Architecture:** Your MCP server exposes tools that AI clients can discover and use
+- **Standardized Communication:** Uses Streamable HTTP for real-time bidirectional communication
+- **Tool Discovery:** AI assistants can list available tools and their parameters automatically
+- **Global Deployment:** Run on Cloudflare Workers for worldwide, low-latency access
+</Callout>
+
+## Step 1
+## Create Your MCP Server
+
+<StepObjective 
+  what="A Cloudflare Workers-based MCP server that AI assistants can connect to and use."
+  why="Cloudflare Workers provide global deployment with minimal latency, making your MCP tools available worldwide."
+/>
+
+
+<CodeBlock language="bash" title="Create Your MCP Server">
+// Create new MCP server from template
+npm create cloudflare@latest -- my-mcp-server --template=cloudflare/ai/demos/remote-mcp-authless
+
+// Navigate to your new project
+cd my-mcp-server
+
+// Install dependencies and start development server
+npm install
+npm run dev
+</CodeBlock>
+
+<CodeBlock title="Expected Output">
+⚡ Local MCP server running at http://localhost:8787
+🔧 MCP endpoint available at http://localhost:8787/mcp
+</CodeBlock>
+
+<Callout type="note" title="What Just Happened?">
+You've created a fully functional MCP server that includes:
+- **Tool definitions:** Pre-built tools like "add" for mathematical operations
+- **MCP endpoint:** The /mcp route that AI assistants connect to
+- **Error handling:** Robust error responses for debugging
+- **CORS support:** Proper headers for cross-origin requests
+</Callout>
+
+<details>
+<summary><strong>Troubleshooting</strong></summary>
+
+- **npm not found:** Install Node.js v18+ from nodejs.org
+- **Template not found:** Update npm: `npm install -g npm@latest`
+- **Permission denied:** Use `sudo npm install -g wrangler` (macOS/Linux)
+- **Port 8787 busy:** Stop other services or use `npm run dev -- --port 8788`
+- **Build errors:** Delete `node_modules` and run `npm install` again
+
+</details>
+
+## Step 2: Test with MCP Inspector
+
+<StepObjective 
+  what="A connection between the MCP Inspector and your server to verify functionality and test tools."
+  why="The inspector is the easiest way to verify your MCP server is working and explore available tools."
+/>
+
+```bash
+# In a new terminal window (keep your server running)
+npx @modelcontextprotocol/inspector
+```
+
+### Inspector Connection Process:
+1. The inspector starts at `http://127.0.0.1:6274`
+2. Open this URL in your browser
+3. Select **"Streamable HTTP"** as the Transport Type
+4. Enter `http://localhost:8787/mcp` as the Server URL
+5. Click **"Connect"** to establish the connection
+6. Navigate to the **"Tools"** tab to see available functions
+7. Test the **"add"** tool with parameters like `{"a": 5, "b": 3}`
+
+<Callout type="note" title="What You Should See">
+Once connected, the inspector will show:
+- **Server Info:** Basic metadata about your MCP server
+- **Available Tools:** List of tools with their descriptions and parameters
+- **Tool Testing:** Interface to call tools with custom parameters
+- **Response Data:** JSON responses from your tool executions
+</Callout>
+
+<CodeBlock language="bash" title="Successful Connection">
+✅ Connected to MCP Server
+🔧 Found 1 tool: "add" 
+📊 Server responding to requests
+</CodeBlock>
+
+## Step 3: Understanding Your MCP Server
+
+<StepObjective 
+  what="Understanding of your MCP server's architecture and how AI assistants interact with its tools."
+  why="MCP servers expose tools that AI assistants can use to perform actions and access data beyond their training."
+/>
+
+<Callout type="tool" title="MCP Server Architecture">
+Your MCP server provides a standardized interface for AI assistants to:
+- **Discover tools:** List available functions and their parameters
+- **Execute tools:** Run functions with provided arguments
+- **Handle errors:** Provide meaningful feedback when things go wrong
+</Callout>
+
+### 🔍 Common Issues & Solutions
+
+**Inspector won't connect:**
+
+Verify your MCP server is running on `http://localhost:8787` and the MCP endpoint is `/mcp`
+
+**No tools visible:**
+
+Check server logs for errors. The template should provide basic tools by default.
+
+**Port already in use:**
+
+Stop other services using port 8787 or modify the port in your configuration.
+
+✅ **Great work!** You now have a functional MCP server that AI assistants can connect to and use. You're ready to add custom tools in Step 2!

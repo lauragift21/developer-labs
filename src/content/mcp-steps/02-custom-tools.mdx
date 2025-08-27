@@ -1,0 +1,120 @@
+---
+title: "Adding Custom Tools"
+description: "Create custom MCP tools with defined parameter schemas. Implement a random number generator tool."
+stepNumber: 2
+duration: "25 min"
+difficulty: "intermediate"
+tags: ["tools", "schemas", "validation", "zod"]
+prerequisites: ["Completed Step 1", "MCP server running", "MCP Inspector connected"]
+learningObjectives: [
+  "Understand MCP tool schema definition",
+  "Implement custom tools with input validation",
+  "Test custom tools using the MCP Inspector",
+  "Handle tool execution errors gracefully"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+
+
+<Callout type="tool" title="Understanding MCP Tool schema">
+MCP tools have a three-part structure: name, schema, and handler. The schema uses Zod for parameter validation and type safety.
+
+- **Tool Name:** Unique identifier for the tool
+- **Schema:** Zod object defining input parameters
+- **Handler:** Async function that processes the request
+- **Response Format:** Structured content array for AI consumption
+</Callout>
+
+## Step 1: Open Your MCP Server Code
+
+<StepObjective 
+  what="A custom MCP tool with parameter validation using Zod schemas."
+  why="Custom tools extend AI capabilities with structured, validated functions that can be called reliably."
+/>
+
+### 📝 Instructions:
+1. Open your project in your IDE
+2. Navigate to `src/index.ts`
+3. Find the existing tool definitions
+4. Prepare to add a new tool after the existing ones
+
+## Step 2: Add Random Number Generator Tool
+
+<StepObjective 
+  what="A random number generator tool that demonstrates MCP's three-part architecture with Zod validation."
+  why="This tool showcases parameter validation, async handlers, and proper MCP response formatting."
+/>
+
+<Callout type="important" title="Before You Code">
+Make sure your MCP server is running and you have the MCP Inspector connected before adding new tools.
+</Callout>
+
+<CodeBlock language="typescript" filename="src/index.ts">
+{`this.server.tool(
+    "randomNumber",
+    { a: z.number(), b: z.number() },
+    async ({ a, b }) => ({
+        content: [{
+            type: "text",
+            text: String(Math.floor(Math.random() * (b - a + 1)) + a)
+        }],
+    })
+);`}
+</CodeBlock>
+
+<Callout type="tool" title="Understanding the Code">
+This tool demonstrates MCP's three-part structure:
+- **Tool Name:** "randomNumber" - unique identifier
+- **Schema:** Zod validation for parameters a and b
+- **Handler:** Async function that processes and returns content
+- **Response:** MCP-compliant content array structure
+</Callout>
+
+<CodeBlock language="bash" title="Expected Result">
+✅ Tool "randomNumber" registered successfully
+🎲 Generates random numbers in specified range
+📋 Parameters validated with Zod schemas
+</CodeBlock>
+
+## Step 3: Test With MCP Inspector
+
+<StepObjective 
+  what="A complete testing workflow to verify your new tool works correctly with the MCP Inspector."
+  why="Testing ensures your tools function properly before AI assistants try to use them in production."
+/>
+
+### Testing Process
+
+```bash
+# Save your changes and restart the server
+npm start
+
+# In a new terminal window
+npx @modelcontextprotocol/inspector
+```
+
+### 🧪 Testing Process:
+1. The inspector opens at `http://127.0.0.1:6274`
+2. Select **"Streamable HTTP"** as Transport Type
+3. Enter `http://localhost:8787/mcp` as Server URL
+4. Click **"Connect"** to establish connection
+5. Navigate to the **"Tools"** tab
+6. Find and test **"randomNumber"** tool
+7. Try parameters like `{"a": 1, "b": 10}`
+
+### What You Should See
+Once connected and testing, verify:
+- **Tool Listed:** "randomNumber" appears in tools list
+- **Parameters Visible:** Shows a and b as number inputs
+- **Responses Work:** Returns random numbers in range
+- **Validation Works:** Rejects invalid parameter types
+
+<CodeBlock language="text" title="Successful Test">
+✅ Tool "randomNumber" found and working 
+🎲 Returns: "7" (for input {`{"a": 1, "b": 10}`}) 
+🔧 Parameter validation functioning
+</CodeBlock>

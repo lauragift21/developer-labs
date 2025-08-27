@@ -1,0 +1,385 @@
+---
+export interface Props {
+  currentStep: number;
+  totalSteps: number;
+  prevStep?: {
+    title: string;
+    slug: string;
+  };
+  nextStep?: {
+    title: string;
+    slug: string;
+  };
+  class?: string;
+}
+
+const { currentStep, totalSteps, prevStep, nextStep, class: className = '' } = Astro.props;
+---
+
+<nav class={`step-navigation ${className}`}>
+  <div class="step-progress">
+    <span class="step-counter">Step {currentStep} of {totalSteps}</span>
+    <div class="progress-bar">
+      <div class="progress-fill" style={`width: ${(currentStep / totalSteps) * 100}%`}></div>
+    </div>
+  </div>
+  
+  <div class="nav-buttons">
+    {prevStep ? (
+      <a href={prevStep.slug} class="nav-button nav-prev" data-scroll-to={prevStep.slug}>
+        <span class="nav-icon">←</span>
+        <div class="nav-content">
+          <span class="nav-label">Previous</span>
+          <span class="nav-title">{prevStep.title}</span>
+        </div>
+      </a>
+    ) : (
+      <div class="nav-button nav-disabled">
+        <span class="nav-icon">←</span>
+        <div class="nav-content">
+          <span class="nav-label">Previous</span>
+          <span class="nav-title">No previous step</span>
+        </div>
+      </div>
+    )}
+
+    {nextStep ? (
+      <a href={nextStep.slug} class="nav-button nav-next" data-scroll-to={nextStep.slug}>
+        <div class="nav-content">
+          <span class="nav-label">Next</span>
+          <span class="nav-title">{nextStep.title}</span>
+        </div>
+        <span class="nav-icon">→</span>
+      </a>
+    ) : (
+      <div class="nav-button nav-disabled">
+        <div class="nav-content">
+          <span class="nav-label">Next</span>
+          <span class="nav-title">Workshop complete!</span>
+        </div>
+        <span class="nav-icon">🎉</span>
+      </div>
+    )}
+  </div>
+</nav>
+
+<style>
+  /* Base component styles */
+  .step-navigation {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .step-progress {
+    margin-bottom: 1.5rem;
+  }
+
+  .step-counter {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .nav-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .nav-button {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    min-height: 80px;
+    border: 1px solid;
+  }
+
+  .nav-button:hover:not(.nav-disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .nav-prev {
+    justify-content: flex-start;
+  }
+
+  .nav-next {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .nav-icon {
+    font-size: 1.25rem;
+    margin: 0 0.75rem;
+  }
+
+  .nav-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .nav-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 640px) {
+    .nav-buttons {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .nav-button {
+      padding: 0.75rem;
+      min-height: 60px;
+    }
+
+    .nav-next {
+      text-align: left;
+      justify-content: flex-start;
+    }
+
+    .nav-next .nav-content {
+      order: 1;
+    }
+
+    .nav-next .nav-icon {
+      order: 2;
+    }
+  }
+
+  /* LIGHT THEME - Default */
+  .step-navigation {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+
+  .step-counter {
+    color: #6b7280;
+  }
+
+  .progress-bar {
+    background: #f3f4f6;
+  }
+
+  .nav-button {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+    color: #1f2937;
+  }
+
+  .nav-button:hover:not(.nav-disabled) {
+    background: #f1f5f9;
+    border-color: #d1d5db;
+  }
+
+  .nav-icon {
+    color: #6b7280;
+  }
+
+  .nav-label {
+    color: #6b7280;
+  }
+
+  .nav-title {
+    color: #1f2937;
+  }
+
+  /* DARK THEME - Default (no light-mode class) */
+  .step-navigation {
+    background: #111827 !important;
+    border-color: #374151 !important;
+  }
+
+  .step-counter {
+    color: #d1d5db !important;
+  }
+
+  .progress-bar {
+    background: #374151 !important;
+  }
+
+  .nav-button {
+    background: #1f2937 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+  }
+
+  .nav-button:hover:not(.nav-disabled) {
+    background: #374151 !important;
+    border-color: #6b7280 !important;
+  }
+
+  .nav-icon {
+    color: #d1d5db !important;
+  }
+
+  .nav-label {
+    color: #9ca3af !important;
+  }
+
+  .nav-title {
+    color: #f9fafb !important;
+  }
+
+  /* LIGHT THEME - When body has light-mode class */
+  body.light-mode .step-navigation {
+    background: #ffffff !important;
+    border-color: #e5e7eb !important;
+  }
+
+  body.light-mode .step-counter {
+    color: #6b7280 !important;
+  }
+
+  body.light-mode .progress-bar {
+    background: #f3f4f6 !important;
+  }
+
+  body.light-mode .nav-button {
+    background: #f9fafb !important;
+    border-color: #e5e7eb !important;
+    color: #1f2937 !important;
+  }
+
+  body.light-mode .nav-button:hover:not(.nav-disabled) {
+    background: #f1f5f9 !important;
+    border-color: #d1d5db !important;
+  }
+
+  body.light-mode .nav-icon {
+    color: #6b7280 !important;
+  }
+
+  body.light-mode .nav-label {
+    color: #6b7280 !important;
+  }
+
+  body.light-mode .nav-title {
+    color: #1f2937 !important;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle step navigation using the existing LabNavigation system
+    const navButtons = document.querySelectorAll('[data-scroll-to]');
+    
+    navButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('data-scroll-to');
+        
+        if (targetId && targetId.startsWith('#step-')) {
+          // Extract step number from #step-X
+          const stepNumber = targetId.replace('#step-', '');
+          
+          // Wait for the LabNavigation component to be ready
+          const waitForLabNav = () => {
+            if (window.MCPWorkshopApp && window.MCPWorkshopApp.isReady()) {
+              const labNavigation = window.MCPWorkshopApp.getComponent('labNavigation');
+              if (labNavigation) {
+                // Use the existing navigation system
+                labNavigation.navigateToStep(parseInt(stepNumber));
+                
+                // After navigation, scroll to the step header
+                setTimeout(() => {
+                  const targetElement = document.querySelector(targetId);
+                  if (targetElement) {
+                    const stepHeader = targetElement.querySelector('.lab-header');
+                    if (stepHeader) {
+                      stepHeader.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    } else {
+                      targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    }
+                  }
+                }, 50);
+                return;
+              }
+            }
+            
+            // Fallback: try direct navigation after a short delay
+            setTimeout(() => {
+              const targetElement = document.querySelector(targetId);
+              if (targetElement) {
+                // Show the target step
+                document.querySelectorAll('.step-content').forEach(content => {
+                  content.style.display = 'none';
+                });
+                targetElement.style.display = 'block';
+                
+                // Update navigation state
+                document.querySelectorAll('.lab-nav-item').forEach(item => {
+                  item.classList.remove('active');
+                  if (item.getAttribute('data-step') === stepNumber) {
+                    item.classList.add('active');
+                  }
+                });
+                
+                // Scroll to the beginning of the step content
+                const stepHeader = targetElement.querySelector('.lab-header');
+                if (stepHeader) {
+                  stepHeader.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                } else {
+                  targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                }
+                
+                // Update URL
+                history.pushState(null, null, targetId);
+              }
+            }, 100);
+          };
+          
+          waitForLabNav();
+        }
+      });
+    });
+  });
+</script>

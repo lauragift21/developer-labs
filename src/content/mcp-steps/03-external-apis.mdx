@@ -1,0 +1,144 @@
+---
+title: "External API Integration"
+description: "Integrate external APIs into MCP tools. Enhance the random number tool with Cloudflare's drand beacon for true randomness."
+stepNumber: 3
+duration: "30 min"
+difficulty: "intermediate"
+tags: ["apis", "http", "integration", "drand", "external-services"]
+prerequisites: ["Completed Step 2", "randomNumber tool working", "Understanding of HTTP requests"]
+learningObjectives: [
+  "Make HTTP requests from MCP tools",
+  "Handle external API responses and errors",
+  "Implement fallback mechanisms for reliability",
+  "Process external data for AI consumption"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+
+<Callout type="globe" title="External API Integration">
+
+MCP tools can fetch data from external APIs to provide real-time information. Learn about true randomness vs pseudo-randomness and implement fallback mechanisms.
+
+- **True Randomness:** Cloudflare drand provides cryptographically secure randomness
+- **Error Handling:** Always implement fallback strategies
+- **Data Transformation:** Process external API responses appropriately
+- **Reliability:** Graceful degradation when external services fail
+
+</Callout>
+
+## Step 1: Open Your MCP Server Code
+
+<StepObjective 
+  what="Enhanced random number tool that integrates Cloudflare's drand API for cryptographically secure randomness."
+  why="External API integration enables MCP tools to access real-time data and services beyond static responses."
+/>
+
+### 📝 Instructions:
+1. Open your project in your IDE
+2. Navigate to `src/index.ts`
+3. Find your existing randomNumber tool
+4. Prepare to enhance it with drand API integration
+
+## Step 2: Enhance with Cloudflare drand API
+
+<StepObjective 
+  what="An enhanced random number tool that uses Cloudflare's drand API for cryptographically secure randomness with graceful fallback."
+  why="Demonstrates external API integration, error handling, and the difference between true and pseudo-randomness."
+/>
+
+```typescript
+this.server.tool(
+    "randomNumber",
+    { a: z.number(), b: z.number() },
+    async ({ a, b }) => {
+        try {
+            // Fetch true randomness from drand Cloudflare endpoint
+            const response = await fetch("https://drand.cloudflare.com/public/latest");
+            const data = await response.json();
+            
+            // Process randomness
+            const randomHex = data.randomness;
+            const startIndex = Math.floor(Math.random() * (randomHex.length - 8));
+            const randomValue = parseInt(randomHex.slice(startIndex, startIndex + 8), 16);
+            
+            // Scale to requested range
+            const scaledRandom = Math.abs(randomValue) % (b - a + 1) + a;
+            
+            return {
+                content: [{
+                    type: "text",
+                    text: String(scaledRandom)
+                }],
+            };
+        } catch (error) {
+            // Fallback to Math.random if API fails
+            return {
+                content: [{
+                    type: "text",
+                    text: String(Math.floor(Math.random() * (b - a + 1)) + a)
+                }],
+            };
+        }
+    }
+);
+```
+
+<Callout type="globe" title="Understanding External API Integration">
+This enhanced tool demonstrates several key concepts:
+- **drand API:** Cloudflare's beacon provides cryptographic randomness
+- **Data Processing:** Converts hex randomness to usable numbers
+- **Error Handling:** try/catch ensures reliability
+- **Graceful Fallback:** Uses Math.random() if API unavailable
+</Callout>
+
+<CodeBlock language="text" title="Enhanced Result">
+✅ Tool enhanced with drand API integration
+🎲 Now uses cryptographically secure randomness
+🔄 Fallback ensures 100% reliability
+🛡️ Error handling maintains functionality
+</CodeBlock>
+
+## Step 3: Test Enhanced Random Number Tool
+
+<StepObjective 
+  what="A comprehensive test of the enhanced tool to verify external API integration and fallback mechanisms work correctly."
+  why="Testing external API integrations ensures your tools are reliable and handle network failures gracefully."
+/>
+
+### Testing Process
+
+```bash
+# Save changes and restart server
+npm start
+
+# Test the enhanced tool
+npx @modelcontextprotocol/inspector
+```
+
+### 🧪 Testing Process:
+1. Restart your server to load the enhanced tool
+2. Open MCP Inspector at `http://127.0.0.1:6274`
+3. Connect to `http://localhost:8787/mcp`
+4. Navigate to the **"Tools"** tab
+5. Test randomNumber multiple times with `{"a": 1, "b": 10}`
+6. Observe the cryptographically secure randomness
+7. Try disconnecting internet to test fallback (optional)
+
+<Callout type="important" title="What You Should Observe">
+The enhanced tool demonstrates advanced MCP capabilities:
+- **External API Integration:** Successfully fetches from drand
+- **Error Resilience:** Falls back gracefully if API fails
+- **Data Processing:** Transforms hex randomness to numbers
+- **True Randomness:** Better distribution than pseudo-random
+</Callout>
+
+<CodeBlock language="text" title="Enhanced Testing Complete">
+✅ Enhanced tool working with drand API
+🎲 Returns: "3" (cryptographically secure)
+🔄 Fallback tested and functional
+🌐 External API integration successful
+</CodeBlock>

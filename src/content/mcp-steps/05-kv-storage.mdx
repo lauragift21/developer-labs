@@ -1,0 +1,139 @@
+---
+title: "Cloudflare KV Storage"
+description: "Set up Cloudflare KV for persistent data storage. Create tools that can store and retrieve data across sessions."
+stepNumber: 5
+duration: "30 min"
+difficulty: "intermediate"
+tags: ["storage", "kv", "persistence", "cloudflare", "stateful"]
+prerequisites: ["Completed Step 4", "Deployed to Cloudflare Workers", "Understanding of key-value storage"]
+learningObjectives: [
+  "Create and configure Cloudflare KV namespaces",
+  "Implement data persistence in MCP tools",
+  "Handle storage operations and errors",
+  "Build stateful applications with KV"
+]
+---
+
+import Alert from '../../components/Alert.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Callout from '../../components/Callout.astro';
+import StepObjective from '../../components/StepObjective.astro';
+
+<Callout type="note" title="Persistent Storage with KV">
+Cloudflare KV provides global, low-latency key-value storage for your MCP tools, enabling persistent data across sessions.
+
+- **Global Distribution:** Data replicated across Cloudflare's network
+- **Eventually Consistent:** Fast reads with eventual consistency
+- **Generous Limits:** 1GB storage and 100,000 operations daily on free tier
+- **Simple API:** Easy key-value operations (get, put, delete, list)
+
+</Callout>
+
+## Step 1: Create KV Namespace
+
+<StepObjective 
+  what="A KV namespace that provides persistent, globally distributed storage for your MCP server data."
+  why="KV storage enables stateful applications where data persists between AI conversations and user sessions."
+/>
+
+```bash
+# Create a new KV namespace for our MCP server
+npx wrangler kv namespace create "TODO_STORE"
+```
+
+### Setup Process:
+1. Run the command to create a new KV namespace
+2. Copy the namespace ID from the output
+3. Note both the binding name and ID for configuration
+4. Keep this terminal output for the next step
+
+### Namespace Created
+```bash
+✅ KV namespace "TODO_STORE" created
+📋 ID: abc1234567890defghij
+🔧 Ready for wrangler.jsonc binding
+```
+
+## Step 2: Configure KV Binding
+<StepObjective 
+  what="Worker configuration that binds the KV namespace to your MCP server, making it accessible via the TODO_STORE binding."
+  why="Bindings connect external resources to your Worker, allowing secure access to KV storage from your code."
+/>
+
+```json filename="wrangler.jsonc"
+{
+  "kv_namespaces": [
+    {
+      "binding": "TODO_STORE",
+      "id": "abc1234567890defghij"
+    }
+  ]
+}
+```  
+
+### ⚙️ Configuration Steps:
+1. Open your `wrangler.jsonc` file
+2. Add the KV namespace configuration
+3. Replace the ID with your actual namespace ID
+4. Save the file
+5. Run `npm run cf-typegen` to update types
+
+### Configuration Complete
+```bash
+✅ KV namespace bound to TODO_STORE
+🔧 TypeScript types generated
+💾 Ready for storage operations
+```
+
+## Step 3: Test KV Storage Tool
+
+<StepObjective 
+  what="A simple storage tool to test KV functionality and verify that data persists between requests."
+  why="Testing storage operations ensures KV is properly configured before building complex stateful applications."
+/>
+
+```typescript filename="src/index.ts"
+this.server.tool(
+    "storeValue",
+    "Store a simple key-value pair in Cloudflare KV",
+    {
+        key: z.string().describe("Key to store the value under"),
+        value: z.string().describe("Value to store")
+    },
+    async ({ key, value }) => {
+        try {
+            await this.env.TODO_STORE.put(key, value);
+            
+            return {
+                content: [{
+                    type: "text",
+                    text: "Value stored successfully"
+                }]
+            };
+        } catch (error: any) {
+            throw new Error(`Failed to store value: ${error}`);
+        }
+    }
+);
+```
+
+### 🧪 Testing Process:
+1. Add the storeValue tool to your MCP server
+2. Save and restart: `npm run dev`
+3. Test with MCP Inspector
+4. Try storing: `{"key": "test", "value": "hello world"}`
+5. Verify the tool works without errors
+
+<Callout type="note" title="Understanding KV Operations">
+This simple tool demonstrates:
+- **put() Operation:** Stores data in KV with a key
+- **Error Handling:** Catches and reports storage failures
+- **Binding Access:** Uses this.env.TODO_STORE from configuration
+- **Async Operations:** Awaits KV operations for reliability
+</Callout>
+
+<CodeBlock language="bash" title="Storage Test Success">
+✅ KV storage tool working
+💾 Data stored successfully
+🔧 Ready to build stateful apps
+</CodeBlock>

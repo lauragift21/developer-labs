@@ -1,0 +1,69 @@
+/* Step Content Overflow Fixes */
+
+/* Ensure step content markdown doesn't overflow */
+.step-content-markdown {
+  overflow-x: auto;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Handle long content in markdown elements */
+.step-content-markdown * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Specific handling for code blocks and pre elements */
+.step-content-markdown pre,
+.step-content-markdown .code-block {
+  overflow-x: auto;
+  max-width: 100%;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+}
+
+/* Handle long URLs and inline code */
+.step-content-markdown code {
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+/* Handle tables that might overflow */
+.step-content-markdown table {
+  width: 100%;
+  table-layout: auto;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
+}
+
+.step-content-markdown table tbody,
+.step-content-markdown table thead,
+.step-content-markdown table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Handle long text content */
+.step-content-markdown p,
+.step-content-markdown li,
+.step-content-markdown div {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Ensure images don't overflow */
+.step-content-markdown img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Handle horizontal scrolling for wide content */
+.step-content-markdown .wide-content {
+  overflow-x: auto;
+  max-width: 100%;
+}
