@@ -1,6 +1,7 @@
 ---
 interface Props {
 	title: string;
+	labType: 'workers' | 'mcp';
 	description?: string;
 	image?: string;
 	url?: string;
@@ -8,12 +9,46 @@ interface Props {
 
 const { 
 	title, 
-	description = "Learn to build Model Context Protocol (MCP) servers with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
-	image = "https://learnmcp.examples.workers.dev/og-image.png",
-	url = "https://learnmcp.examples.workers.dev/"
+	labType,
+	description,
+	image = "/og-image.png",
+	url
 } = Astro.props;
 
-const fullTitle = title === "Learn MCP" ? "Learn MCP - Build a Model Context Protocol server with Cloudflare Workers" : `${title} | Learn MCP`;
+// Lab-specific configurations
+const labConfig = {
+	workers: {
+		defaultDescription: "Learn to build serverless applications at the edge with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+		defaultUrl: "https://developer-labs.pages.dev/labs/workers",
+		keywords: "Cloudflare Workers, serverless, edge computing, tutorial, hands-on labs, API integration",
+		siteName: "Learn Cloudflare Workers",
+		structuredDataTeaches: [
+			"Cloudflare Workers",
+			"Serverless Computing",
+			"Edge Computing",
+			"API Integration",
+			"JavaScript"
+		]
+	},
+	mcp: {
+		defaultDescription: "Learn to build Model Context Protocol (MCP) servers with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+		defaultUrl: "https://developer-labs.pages.dev/labs/mcp",
+		keywords: "MCP, Model Context Protocol, Cloudflare Workers, Hono, AI tools, tutorial, hands-on labs, API integration, serverless",
+		siteName: "Learn MCP",
+		structuredDataTeaches: [
+			"Model Context Protocol (MCP)",
+			"Cloudflare Workers",
+			"Hono Framework",
+			"API Integration",
+			"Serverless Development"
+		]
+	}
+};
+
+const config = labConfig[labType];
+const finalDescription = description || config.defaultDescription;
+const finalUrl = url || config.defaultUrl;
+const fullTitle = `${title} | ${config.siteName}`;
 ---
 
 <!doctype html>
@@ -24,29 +59,29 @@ const fullTitle = title === "Learn MCP" ? "Learn MCP - Build a Model Context Pro
 		<!-- Primary Meta Tags -->
 		<title>{fullTitle}</title>
 		<meta name="title" content={fullTitle} />
-		<meta name="description" content={description} />
+		<meta name="description" content={finalDescription} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="robots" content="index, follow" />
 		<meta name="language" content="English" />
 		<meta name="author" content="Cloudflare" />
-		<meta name="keywords" content="MCP, Model Context Protocol, Cloudflare Workers, Hono, AI tools, tutorial, hands-on labs, API integration, serverless" />
+		<meta name="keywords" content={config.keywords} />
 		
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
-		<meta property="og:url" content={url} />
+		<meta property="og:url" content={finalUrl} />
 		<meta property="og:title" content={fullTitle} />
-		<meta property="og:description" content={description} />
+		<meta property="og:description" content={finalDescription} />
 		<meta property="og:image" content={image} />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
-		<meta property="og:site_name" content="Learn MCP" />
+		<meta property="og:site_name" content={config.siteName} />
 		<meta property="og:locale" content="en_US" />
 		
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
-		<meta property="twitter:url" content={url} />
+		<meta property="twitter:url" content={finalUrl} />
 		<meta property="twitter:title" content={fullTitle} />
-		<meta property="twitter:description" content={description} />
+		<meta property="twitter:description" content={finalDescription} />
 		<meta property="twitter:image" content={image} />
 		<meta property="twitter:creator" content="@cloudflare" />
 		<meta property="twitter:site" content="@cloudflare" />
@@ -54,17 +89,17 @@ const fullTitle = title === "Learn MCP" ? "Learn MCP - Build a Model Context Pro
 		<!-- Additional Meta Tags -->
 		<meta name="theme-color" content="#f38020" />
 		<meta name="msapplication-TileColor" content="#f38020" />
-		<meta name="application-name" content="Learn MCP" />
+		<meta name="application-name" content={config.siteName} />
 		
 		<!-- Canonical URL -->
-		<link rel="canonical" href={url} />
+		<link rel="canonical" href={finalUrl} />
 		
 		<!-- Favicon and Icons -->
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-		<link rel="manifest" href="/site.webmanifest" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
+		<link rel="manifest" href="/assets/site.webmanifest" />
 		
 		<!-- Lab Stylesheets -->
 		<link rel="stylesheet" href="/assets/css/main.css">
@@ -81,23 +116,17 @@ const fullTitle = title === "Learn MCP" ? "Learn MCP - Build a Model Context Pro
 		{
 			"@context": "https://schema.org",
 			"@type": "Course",
-			"name": "Learn MCP - Build a Model Context Protocol server with Cloudflare Workers",
-			"description": "Learn to build Model Context Protocol (MCP) servers with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+			"name": fullTitle,
+			"description": finalDescription,
 			"provider": {
 				"@type": "Organization",
 				"name": "Cloudflare",
 				"url": "https://cloudflare.com"
 			},
 			"educationalLevel": "Intermediate",
-			"teaches": [
-				"Model Context Protocol (MCP)",
-				"Cloudflare Workers",
-				"Hono Framework",
-				"API Integration",
-				"Serverless Development"
-			],
-			"url": "https://learnmcp.examples.workers.dev/",
-			"image": "https://learnmcp.examples.workers.dev/og-image.png"
+			"teaches": config.structuredDataTeaches,
+			"url": finalUrl,
+			"image": image
 		}
 		</script>
 	</head>

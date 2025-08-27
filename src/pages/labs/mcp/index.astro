@@ -1,5 +1,5 @@
 ---
-import MCPLayout from '../../../layouts/MCPLayout.astro';
+import LabLayout from '../../../layouts/LabLayout.astro';
 import { getCollection } from 'astro:content';
 
 // Get all workshop steps
@@ -20,7 +20,7 @@ const processedSteps = await Promise.all(
 );
 ---
 
-<MCPLayout title='Learn MCP'>
+<LabLayout title='Learn MCP' labType='mcp'>
   <main>
     <!-- Navigation -->
     <nav class='navbar'>
@@ -375,7 +375,7 @@ const processedSteps = await Promise.all(
       </div>
     </div>
   </footer>
-</MCPLayout>
+</LabLayout>
 
 <!-- JavaScript -->
 <script src='/assets/js/app.js' type='module'></script>

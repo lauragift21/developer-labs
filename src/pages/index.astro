@@ -1,11 +1,156 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import LabLayout from '../layouts/LabLayout.astro';
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<LabLayout title='Developer Labs' labType='workers'>
+  <main>
+    <!-- Navigation -->
+    <nav class='navbar'>
+      <div class='nav-container'>
+        <div class='nav-logo'>
+          <img
+            src='https://www.cloudflare.com/img/logo-web-badges/cf-logo-on-white-bg.svg'
+            alt='Cloudflare'
+            height='40'
+          />
+          <span>Developer Labs</span>
+        </div>
+        <ul class='nav-menu'>
+          <li><a href='#course-intro' class='nav-link'>Overview</a></li>
+          <li><a href='#labs' class='nav-link'>Labs</a></li>
+          <li><a href='#features' class='nav-link'>Features</a></li>
+          <li>
+            <button id='theme-toggle' class='theme-toggle' aria-label='Toggle dark/light mode'
+              >🌙</button
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Modern Hero Section -->
+    <section id='course-intro' class='hero'>
+      <div class='container'>
+        <div class='hero-content'>
+          <h1 class='hero-title'>Developer Labs</h1>
+          <p class='hero-subtitle'>
+            Interactive tutorials and hands-on labs for building with Cloudflare's Developer Platform
+          </p>
+
+          <div class='hero-buttons'>
+            <a href='#labs' class='btn btn-primary'>Explore Labs →</a>
+            <a href='#features' class='btn btn-secondary'>Learn More</a>
+          </div>
+        </div>
+
+        <!-- Lab Overview Cards -->
+        <div class='workshop-overview' id='labs'>
+          <div class='overview-card'>
+            <h3>🚀 Cloudflare Workers</h3>
+            <p>Build serverless applications at the edge with JavaScript. Learn Workers fundamentals, APIs, and deployment.</p>
+            <ul>
+              <li>HTTP APIs with routing</li>
+              <li>KV storage & caching</li>
+              <li>D1 database applications</li>
+              <li>AI-powered Workers</li>
+            </ul>
+            <div class='card-footer'>
+              <span class='duration'>7 steps • ~2 hours</span>
+              <a href='/labs/workers' class='btn btn-primary btn-sm'>Start Lab →</a>
+            </div>
+          </div>
+
+          <div class='overview-card'>
+            <h3>🤖 Model Context Protocol</h3>
+            <p>Build AI assistant tools with MCP. Connect AI models to external data sources and services securely.</p>
+            <ul>
+              <li>Custom AI assistant tools</li>
+              <li>Persistent todo applications</li>
+              <li>External API integrations</li>
+              <li>Real-time data processors</li>
+            </ul>
+            <div class='card-footer'>
+              <span class='duration'>7 steps • ~2 hours</span>
+              <a href='/labs/mcp' class='btn btn-primary btn-sm'>Start Lab →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id='features' class='section'>
+      <div class='container'>
+        <h2 class='section-title'>Why Developer Labs?</h2>
+        
+        <div class='fundamentals-grid'>
+          <div class='fundamentals-card'>
+            <h3>🎯 Hands-on Learning</h3>
+            <p>
+              Build real applications step-by-step with guided tutorials. Each lab includes 
+              interactive exercises, code examples, and practical projects you can deploy.
+            </p>
+          </div>
+
+          <div class='fundamentals-card'>
+            <h3>🚀 Production Ready</h3>
+            <p>
+              Deploy your projects to Cloudflare's global network with a single command. 
+              Learn best practices for building scalable, performant applications.
+            </p>
+          </div>
+
+          <div class='fundamentals-card'>
+            <h3>💡 Modern Stack</h3>
+            <p>
+              Master the latest technologies including serverless computing, edge AI, 
+              and distributed databases. Stay ahead with cutting-edge development patterns.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Getting Started -->
+    <section class='section section-alt'>
+      <div class='container'>
+        <h2 class='section-title'>Get Started</h2>
+        <p class='intro-text'>Ready to build? Choose your learning path:</p>
+
+        <div class='prerequisites-grid'>
+          <div class='prereq-item'>
+            <span class='prereq-icon'>⚡</span>
+            <div class='prereq-content'>
+              <h4>New to Serverless?</h4>
+              <p>Start with <a href='/labs/workers'>Cloudflare Workers</a> to learn edge computing fundamentals</p>
+            </div>
+          </div>
+          <div class='prereq-item'>
+            <span class='prereq-icon'>🤖</span>
+            <div class='prereq-content'>
+              <h4>Building AI Tools?</h4>
+              <p>Explore <a href='/labs/mcp'>Model Context Protocol</a> for AI assistant integrations</p>
+            </div>
+          </div>
+          <div class='prereq-item'>
+            <span class='prereq-icon'>🛠️</span>
+            <div class='prereq-content'>
+              <h4>Prerequisites</h4>
+              <p>Node.js v18+, Cloudflare account, and basic JavaScript knowledge</p>
+            </div>
+          </div>
+          <div class='prereq-item'>
+            <span class='prereq-icon'>⏱️</span>
+            <div class='prereq-content'>
+              <h4>Time Commitment</h4>
+              <p>Each lab takes ~2 hours with progressive, hands-on exercises</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</LabLayout>
+
+<!-- JavaScript -->
+<script src='/assets/js/app.js' type='module'></script>
