@@ -33,7 +33,7 @@ const processedSteps = await Promise.all(
           />
           <span>Learn MCP</span>
         </div>
-        <ul class='nav-menu'>
+        <ul class='nav-menu' id='nav-menu'>
           <li><a href='#course-intro' class='nav-link'>Overview</a></li>
           <li><a href='#fundamentals' class='nav-link'>Fundamentals</a></li>
           <li><a href='#hands-on' class='nav-link'>Labs</a></li>
@@ -44,6 +44,9 @@ const processedSteps = await Promise.all(
             >
           </li>
         </ul>
+        <button class='mobile-menu-toggle' id='mobile-menu-toggle' aria-label='Toggle mobile menu'>
+          ☰
+        </button>
       </div>
     </nav>
 

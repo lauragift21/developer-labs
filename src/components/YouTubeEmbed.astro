@@ -1,0 +1,104 @@
+---
+export interface Props {
+  videoId: string;
+  title?: string;
+  width?: string;
+  height?: string;
+  autoplay?: boolean;
+  muted?: boolean;
+  controls?: boolean;
+  modestbranding?: boolean;
+  rel?: boolean;
+}
+
+const {
+  videoId,
+  title = "YouTube video player",
+  width = "100%",
+  height = "315",
+  autoplay = false,
+  muted = false,
+  controls = true,
+  modestbranding = true,
+  rel = false,
+} = Astro.props;
+
+// Build YouTube embed URL with parameters
+const params = new URLSearchParams({
+  autoplay: autoplay ? "1" : "0",
+  mute: muted ? "1" : "0",
+  controls: controls ? "1" : "0",
+  modestbranding: modestbranding ? "1" : "0",
+  rel: rel ? "1" : "0",
+});
+
+const embedUrl = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+---
+
+<div class="youtube-embed">
+  <div class="video-wrapper">
+    <iframe
+      src={embedUrl}
+      title={title}
+      width={width}
+      height={height}
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+      loading="lazy"
+    ></iframe>
+  </div>
+</div>
+
+<style>
+  .youtube-embed {
+    margin: var(--space-6) 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    transition: all var(--duration-normal) var(--ease-out);
+  }
+
+  .youtube-embed:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-secondary);
+  }
+
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .youtube-embed {
+      margin: var(--space-4) 0;
+      border-radius: var(--radius-md);
+    }
+  }
+
+  /* Light mode adjustments */
+  body.light-mode .youtube-embed {
+    background: var(--bg-surface);
+    border-color: var(--border-primary);
+  }
+
+  body.light-mode .youtube-embed:hover {
+    border-color: var(--border-secondary);
+    box-shadow: var(--shadow-md);
+  }
+</style>

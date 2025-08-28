@@ -33,7 +33,7 @@ const processedSteps = await Promise.all(
           />
           <span>Learn Cloudflare Workers</span>
         </div>
-        <ul class='nav-menu'>
+        <ul class='nav-menu' id='nav-menu'>
           <li><a href='#course-intro' class='nav-link'>Overview</a></li>
           <li><a href='#fundamentals' class='nav-link'>Fundamentals</a></li>
           <li><a href='#hands-on' class='nav-link'>Labs</a></li>
@@ -44,6 +44,9 @@ const processedSteps = await Promise.all(
             >
           </li>
         </ul>
+        <button class='mobile-menu-toggle' id='mobile-menu-toggle' aria-label='Toggle mobile menu'>
+          ☰
+        </button>
       </div>
     </nav>
 
@@ -136,7 +139,7 @@ const processedSteps = await Promise.all(
   </main>
 
   <!-- Prerequisites -->
-  <section id='setup' class='section section-alt'>
+  <section id='setup' class='section'>
     <div class='container'>
       <h2 class='section-title'>Prerequisites</h2>
       <p class='intro-text'>Before starting the workshop, ensure you have:</p>

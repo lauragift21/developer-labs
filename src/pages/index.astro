@@ -15,31 +15,33 @@ import LabLayout from '../layouts/LabLayout.astro';
           />
           <span>Developer Labs</span>
         </div>
-        <ul class='nav-menu'>
-          <li><a href='#course-intro' class='nav-link'>Overview</a></li>
-          <li><a href='#labs' class='nav-link'>Labs</a></li>
-          <li><a href='#features' class='nav-link'>Features</a></li>
+        <ul class='nav-menu' id='nav-menu'>
+          <li><a href='#labs' class='nav-link'>Browse Labs</a></li>
+          <li><a href='#about' class='nav-link'>Why Labs?</a></li>
           <li>
             <button id='theme-toggle' class='theme-toggle' aria-label='Toggle dark/light mode'
               >🌙</button
             >
           </li>
         </ul>
+        <button class='mobile-menu-toggle' id='mobile-menu-toggle' aria-label='Toggle mobile menu'>
+          ☰
+        </button>
       </div>
     </nav>
 
-    <!-- Modern Hero Section -->
-    <section id='course-intro' class='hero'>
+    <!-- Hero Section -->
+    <section id='hero' class='hero'>
       <div class='container'>
         <div class='hero-content'>
-          <h1 class='hero-title'>Developer Labs</h1>
+          <h1 class='hero-title'>Master Cloudflare Development</h1>
           <p class='hero-subtitle'>
-            A comprehensive directory of hands-on labs for mastering Cloudflare's Developer Platform.
+            Interactive tutorials and hands-on labs to build production-ready applications on Cloudflare's edge platform.
           </p>
 
           <div class='hero-buttons'>
-            <a href='#labs' class='btn btn-primary'>Browse All Labs →</a>
-            <a href='#features' class='btn btn-secondary'>Why Labs?</a>
+            <a href='#labs' class='btn btn-primary'>Start Learning →</a>
+            <a href='#about' class='btn btn-secondary'>Why Labs?</a>
           </div>
         </div>
 
@@ -47,13 +49,11 @@ import LabLayout from '../layouts/LabLayout.astro';
         <div class='workshop-overview' id='labs'>
           <div class='overview-card'>
             <div class='card-header'>
-              <div class='card-badge'>Beginner</div>
-              <h3>Learn Cloudflare Workers</h3>
-              <p class='card-subtitle'>🚀 Serverless Computing at the Edge</p>
+              <h3>⚡ Learn Cloudflare Workers</h3>
             </div>
             
             <div class='card-content'>
-              <p>Master serverless computing with JavaScript applications that run globally with zero cold starts.</p>
+              <p>Build and deploy serverless applications at the edge with Cloudflare Workers.</p>
               
               <div class='card-highlights'>
                 <span class='highlight-tag'>HTTP APIs</span>
@@ -64,8 +64,9 @@ import LabLayout from '../layouts/LabLayout.astro';
             </div>
             
             <div class='card-footer'>
-              <div class='card-meta'>
-                <span class='duration'>7 steps • ~2 hours</span>
+              <div class='card-badges'>
+                <span class='badge badge-duration'>2h</span>
+                <span class='badge badge-labs'>8 labs</span>
               </div>
               <a href='/labs/workers' class='btn btn-primary btn-sm'>Start Lab →</a>
             </div>
@@ -73,9 +74,7 @@ import LabLayout from '../layouts/LabLayout.astro';
 
           <div class='overview-card'>
             <div class='card-header'>
-              <div class='card-badge intermediate'>Intermediate</div>
-              <h3>Learn MCP</h3>
-              <p class='card-subtitle'>🤖 Model Context Protocol for AI Assistant Integrations</p>
+              <h3>🤖 Learn MCP</h3>
             </div>
             
             <div class='card-content'>
@@ -89,9 +88,10 @@ import LabLayout from '../layouts/LabLayout.astro';
               </div>
             </div>
             
-            <div class='card-footer'>
-              <div class='card-meta'>
-                <span class='duration'>7 steps • ~2 hours</span>
+            <div class='card-footer'> 
+              <div class='card-badges'>
+                <span class='badge badge-duration'>2h</span>
+                <span class='badge badge-labs'>6 labs</span>
               </div>
               <a href='/labs/mcp' class='btn btn-primary btn-sm'>Start Lab →</a>
             </div>
@@ -99,106 +99,65 @@ import LabLayout from '../layouts/LabLayout.astro';
 
           <div class='overview-card coming-soon'>
             <div class='card-header'>
-              <div class='card-badge coming'>Coming Soon</div>
-              <h3>🔮 More Labs</h3>
-              <p class='card-subtitle'>Expanding Our Directory</p>
+              <h3>🔮 More Labs Coming Soon</h3>
             </div>
             
             <div class='card-content'>
-              <p>We're developing new tutorials covering R2 storage, Durable Objects, and advanced AI workflows.</p>
+              <p>New tutorials covering R2 storage, Durable Objects, and advanced AI workflows.</p>
               
               <div class='card-highlights'>
                 <span class='highlight-tag'>R2 Storage</span>
                 <span class='highlight-tag'>Durable Objects</span>
                 <span class='highlight-tag'>AI Gateway</span>
-                <span class='highlight-tag'>Performance</span>
               </div>
             </div>
             
             <div class='card-footer'>
-              <div class='card-meta'>
-                <span class='duration'>Q4 2025</span>
+              <div class='card-badges'>
+                <span class='badge badge-duration badge-placeholder'>TBD</span>
+                <span class='badge badge-labs badge-placeholder'>TBD</span>
               </div>
+              <span class='coming-soon-text'>Coming Q4 2025</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section id='features' class='section'>
+    <!-- About Section -->
+    <section id='about' class='section'>
       <div class='container'>
-        <h2 class='section-title'>Why Choose Our Lab Directory?</h2>
-        
-        <div class='fundamentals-grid'>
-          <div class='fundamentals-card'>
-            <h3>🎯 Curated Learning Paths</h3>
-            <p>
-              Each lab is carefully designed with progressive difficulty and real-world applications. 
-              Our directory organizes tutorials by skill level, technology focus, and learning objectives 
-              to help you find exactly what you need.
-            </p>
+        <div class='about-content'>
+          <h2 class='section-title'>Why Developer Labs?</h2>
+          <p class='section-description'>
+            Skip the theory and dive straight into building. Our labs are designed by Cloudflare developers 
+            to teach you the skills you need through practical, real-world projects.
+          </p>
+          
+          <div class='features-simple'>
+            <div class='feature-item'>
+              <h3>🎯 Interactive Learning</h3>
+              <p>Follow step-by-step tutorials that guide you through building complete applications</p>
+            </div>
+            <div class='feature-item'>
+              <h3>🚀 Deploy Immediately</h3>
+              <p>Every lab results in a working application you can deploy and share</p>
+            </div>
+            <div class='feature-item'>
+              <h3>⚡ Modern Stack</h3>
+              <p>Learn the latest tools and patterns used by top development teams</p>
+            </div>
           </div>
-
-          <div class='fundamentals-card'>
-            <h3>🚀 Production-Ready Skills</h3>
-            <p>
-              Learn by building applications you can actually deploy and use. Every lab teaches 
-              industry best practices, security considerations, and performance optimization 
-              techniques used by top developers.
-            </p>
-          </div>
-
-          <div class='fundamentals-card'>
-            <h3>⚡ Self-Paced Learning</h3>
-            <p>
-              Learn at your own speed with detailed step-by-step instructions, code examples, 
-              and troubleshooting guides. Each lab is designed to be completed independently 
-              or as part of a larger learning journey.
-            </p>
+          
+          <div class='cta-section'>
+            <h3>Ready to start building?</h3>
+            <p>Choose your first lab below and begin your journey into edge development.</p>
+            <a href='#labs' class='btn btn-primary'>Browse Labs →</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Getting Started -->
-    <section class='section section-alt'>
-      <div class='container'>
-        <h2 class='section-title'>Find Your Perfect Lab</h2>
-        <p class='intro-text'>Browse our directory by skill level, technology, or learning goal:</p>
-
-        <div class='prerequisites-grid'>
-          <div class='prereq-item'>
-            <span class='prereq-icon'>🌱</span>
-            <div class='prereq-content'>
-              <h4>Beginner Labs</h4>
-              <p>New to Cloudflare? Start with <a href='/labs/workers'>Workers fundamentals</a> and basic edge computing concepts</p>
-            </div>
-          </div>
-          <div class='prereq-item'>
-            <span class='prereq-icon'>🚀</span>
-            <div class='prereq-content'>
-              <h4>Intermediate Labs</h4>
-              <p>Ready for more? Dive into <a href='/labs/mcp'>AI integrations</a> and advanced serverless patterns</p>
-            </div>
-          </div>
-          <div class='prereq-item'>
-            <span class='prereq-icon'>🎯</span>
-            <div class='prereq-content'>
-              <h4>By Technology</h4>
-              <p>Focus on specific tools: Workers, AI Gateway, D1 Database, KV Storage, or Durable Objects</p>
-            </div>
-          </div>
-          <div class='prereq-item'>
-            <span class='prereq-icon'>🏆</span>
-            <div class='prereq-content'>
-              <h4>Learning Outcomes</h4>
-              <p>Build deployable applications, earn completion certificates, and join our developer community</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 </LabLayout>
 
