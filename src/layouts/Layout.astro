@@ -11,7 +11,7 @@ const {
 	title, 
 	labType,
 	description,
-	image = "/og-image.png",
+	image = "https://developer-labs.examples.workers.dev/assets/og-image.png",
 	url
 } = Astro.props;
 
@@ -20,6 +20,7 @@ const labConfig = {
 	workers: {
 		defaultDescription: "Learn to build serverless applications at the edge with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
 		defaultUrl: "https://developer-labs.examples.workers.dev/labs/workers",
+		defaultImage: "https://developer-labs.examples.workers.dev/assets/og-image.png",
 		keywords: "Cloudflare Workers, serverless, edge computing, tutorial, hands-on labs, API integration",
 		siteName: "Learn Cloudflare Workers",
 		structuredDataTeaches: [
@@ -33,6 +34,7 @@ const labConfig = {
 	mcp: {
 		defaultDescription: "Learn to build Model Context Protocol (MCP) servers with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
 		defaultUrl: "https://developer-labs.examples.workers.dev/labs/mcp",
+		defaultImage: "https://developer-labs.examples.workers.dev/assets/og-image.png",
 		keywords: "MCP, Model Context Protocol, Cloudflare Workers, Hono, AI tools, tutorial, hands-on labs, API integration, serverless",
 		siteName: "Learn MCP",
 		structuredDataTeaches: [
@@ -48,7 +50,7 @@ const labConfig = {
 const config = labConfig[labType];
 const finalDescription = description || config.defaultDescription;
 const finalUrl = url || config.defaultUrl;
-const fullTitle = `${title} | ${config.siteName}`;
+const fullTitle = `${title}`;
 ---
 
 <!doctype html>
@@ -95,11 +97,11 @@ const fullTitle = `${title} | ${config.siteName}`;
 		<link rel="canonical" href={finalUrl} />
 		
 		<!-- Favicon and Icons -->
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-		<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
-		<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
-		<link rel="manifest" href="/assets/site.webmanifest" />
+		<link rel="icon" type="image/svg+xml" href="https://developer-labs.examples.workers.dev/favicon.svg" />
+		<link rel="apple-touch-icon" sizes="180x180" href="https://developer-labs.examples.workers.dev/assets/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="https://developer-labs.examples.workers.dev/assets/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="https://developer-labs.examples.workers.dev/assets/favicon-16x16.png" />
+		<link rel="manifest" href="https://developer-labs.examples.workers.dev/assets/site.webmanifest" />
 		
 		<!-- Lab Stylesheets -->
 		<link rel="stylesheet" href="/assets/css/main.css">
