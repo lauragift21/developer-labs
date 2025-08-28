@@ -49,11 +49,14 @@ import LabLayout from '../layouts/LabLayout.astro';
         <div class='workshop-overview' id='labs'>
           <div class='overview-card'>
             <div class='card-header'>
-              <h3>⚡ Learn Cloudflare Workers</h3>
+              <div class='card-icon'>⚡</div>
+              <div class='card-title-group'>
+                <h3>Cloudflare Workers</h3>
+              </div>
             </div>
             
             <div class='card-content'>
-              <p>Build and deploy serverless applications at the edge with Cloudflare Workers.</p>
+              <p>Build lightning-fast applications that run on Cloudflare's global network. Learn to create APIs, handle requests, and integrate with databases, all without managing servers.</p>
               
               <div class='card-highlights'>
                 <span class='highlight-tag'>HTTP APIs</span>
@@ -74,7 +77,10 @@ import LabLayout from '../layouts/LabLayout.astro';
 
           <div class='overview-card'>
             <div class='card-header'>
-              <h3>🤖 Learn MCP</h3>
+              <div class='card-icon'>🤖</div>
+              <div class='card-title-group'>
+                <h3>Model Context Protocol</h3>
+              </div>
             </div>
             
             <div class='card-content'>
@@ -99,7 +105,10 @@ import LabLayout from '../layouts/LabLayout.astro';
 
           <div class='overview-card coming-soon'>
             <div class='card-header'>
-              <h3>🔮 More Labs Coming Soon</h3>
+              <div class='card-icon'>🔮</div>
+              <div class='card-title-group'>
+                <h3>More Labs Coming Soon</h3>
+              </div>
             </div>
             
             <div class='card-content'>
@@ -128,7 +137,7 @@ import LabLayout from '../layouts/LabLayout.astro';
     <section id='about' class='section'>
       <div class='container'>
         <div class='about-content'>
-          <h2 class='section-title'>Why Developer Labs?</h2>
+          <h2 class='section-title'>Why Choose Developer Labs?</h2>
           <p class='section-description'>
             Skip the theory and dive straight into building. Our labs are designed by Cloudflare developers 
             to teach you the skills you need through practical, real-world projects.
@@ -150,9 +159,12 @@ import LabLayout from '../layouts/LabLayout.astro';
           </div>
           
           <div class='cta-section'>
-            <h3>Ready to start building?</h3>
-            <p>Choose your first lab below and begin your journey into edge development.</p>
-            <a href='#labs' class='btn btn-primary'>Browse Labs →</a>
+            <h3>Start Building Today</h3>
+            <p>Join thousands of developers mastering the developer platform. Choose your path and build your first application in the next hour.</p>
+            <div class='cta-buttons'>
+              <a href='#labs' class='btn btn-primary btn-large'>Choose Your Lab →</a>
+              <a href='https://discord.gg/cloudflaredev' target='_blank' class='btn btn-secondary'>Join Community</a>
+            </div>
           </div>
         </div>
       </div>
