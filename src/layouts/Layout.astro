@@ -1,23 +1,167 @@
+---
+interface Props {
+	title: string;
+	labType: 'workers' | 'mcp';
+	description?: string;
+	image?: string;
+	url?: string;
+}
+
+const { 
+	title, 
+	labType,
+	description,
+	image = "/og-image.png",
+	url
+} = Astro.props;
+
+// Lab-specific configurations
+const labConfig = {
+	workers: {
+		defaultDescription: "Learn to build serverless applications at the edge with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+		defaultUrl: "https://developer-labs.examples.workers.dev/labs/workers",
+		keywords: "Cloudflare Workers, serverless, edge computing, tutorial, hands-on labs, API integration",
+		siteName: "Learn Cloudflare Workers",
+		structuredDataTeaches: [
+			"Cloudflare Workers",
+			"Serverless Computing",
+			"Edge Computing",
+			"API Integration",
+			"JavaScript"
+		]
+	},
+	mcp: {
+		defaultDescription: "Learn to build Model Context Protocol (MCP) servers with Cloudflare Workers. Interactive tutorial with hands-on labs covering tools and APIs.",
+		defaultUrl: "https://developer-labs.examples.workers.dev/labs/mcp",
+		keywords: "MCP, Model Context Protocol, Cloudflare Workers, Hono, AI tools, tutorial, hands-on labs, API integration, serverless",
+		siteName: "Learn MCP",
+		structuredDataTeaches: [
+			"Model Context Protocol (MCP)",
+			"Cloudflare Workers",
+			"Hono Framework",
+			"API Integration",
+			"Serverless Development"
+		]
+	}
+};
+
+const config = labConfig[labType];
+const finalDescription = description || config.defaultDescription;
+const finalUrl = url || config.defaultUrl;
+const fullTitle = `${title} | ${config.siteName}`;
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		
+		<!-- Primary Meta Tags -->
+		<title>{fullTitle}</title>
+		<meta name="title" content={fullTitle} />
+		<meta name="description" content={finalDescription} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+		<meta name="author" content="Cloudflare" />
+		<meta name="keywords" content={config.keywords} />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={finalUrl} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={finalDescription} />
+		<meta property="og:image" content={image} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:site_name" content={config.siteName} />
+		<meta property="og:locale" content="en_US" />
+		
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={finalUrl} />
+		<meta property="twitter:title" content={fullTitle} />
+		<meta property="twitter:description" content={finalDescription} />
+		<meta property="twitter:image" content={image} />
+		<meta property="twitter:creator" content="@cloudflare" />
+		<meta property="twitter:site" content="@cloudflare" />
+		
+		<!-- Additional Meta Tags -->
+		<meta name="theme-color" content="#f38020" />
+		<meta name="msapplication-TileColor" content="#f38020" />
+		<meta name="application-name" content={config.siteName} />
+		
+		<!-- Canonical URL -->
+		<link rel="canonical" href={finalUrl} />
+		
+		<!-- Favicon and Icons -->
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
+		<link rel="manifest" href="/assets/site.webmanifest" />
+		
+		<!-- Lab Stylesheets -->
+		<link rel="stylesheet" href="/assets/css/main.css">
+		<link rel="stylesheet" href="/assets/css/step-content-overflow.css">
+		
+		<!-- Preconnect for performance -->
+		<link rel="preconnect" href="https://www.cloudflare.com" />
+		
+		<!-- Generator -->
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		
+		<!-- Structured Data -->
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "Course",
+			"name": fullTitle,
+			"description": finalDescription,
+			"provider": {
+				"@type": "Organization",
+				"name": "Cloudflare",
+				"url": "https://cloudflare.com"
+			},
+			"educationalLevel": "Intermediate",
+			"teaches": config.structuredDataTeaches,
+			"url": finalUrl,
+			"image": image
+		}
+		</script>
 	</head>
 	<body>
 		<slot />
-		<script src="/assets/js/navigation.js"></script>
+	<script type="module" src="/assets/js/app.js"></script>
+<script src="/assets/js/navigation.js" is:inline></script>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
+<style is:global>
+	:root {
+		--accent: 136, 58, 234;
+		--accent-light: 224, 204, 250;
+		--accent-dark: 49, 10, 101;
+		--accent-gradient: linear-gradient(
+			45deg,
+			rgb(var(--accent)),
+			rgb(var(--accent-light)) 30%,
+			white 60%
+		);
+	}
+	html {
+		font-family: system-ui, sans-serif;
+		background: #13151a;
+		background-size: 224px;
+	}
+	code {
+		font-family:
+			Menlo,
+			Monaco,
+			Lucida Console,
+			Liberation Mono,
+			DejaVu Sans Mono,
+			Bitstream Vera Sans Mono,
+			Courier New,
+			monospace;
 	}
 </style>

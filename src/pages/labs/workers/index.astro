@@ -1,5 +1,5 @@
 ---
-import LabLayout from '../../../layouts/LabLayout.astro';
+import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
 // Get all workshop steps
@@ -20,7 +20,7 @@ const processedSteps = await Promise.all(
 );
 ---
 
-<LabLayout title='Learn Workers' labType='workers'>
+<Layout title='Learn Workers' labType='workers'>
   <main>
     <!-- Navigation -->
     <nav class='navbar'>
@@ -372,7 +372,7 @@ const processedSteps = await Promise.all(
       </div>
     </div>
   </footer>
-</LabLayout>
+</Layout>
 
 <!-- JavaScript -->
 <script src='/assets/js/app.js' type='module'></script>

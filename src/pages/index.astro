@@ -1,8 +1,14 @@
 ---
-import LabLayout from '../layouts/LabLayout.astro';
+import Layout from '../layouts/Layout.astro';
 ---
 
-<LabLayout title='Developer Labs' labType='workers'>
+<Layout 
+  title="Developer Labs"
+  labType="workers"
+  description="Interactive tutorials and hands-on labs to build production-ready applications on Cloudflare's edge platform. Learn Workers, MCP, and more with step-by-step guides."
+  url="https://developer-labs.examples.workers.dev"    
+  image="/og-image.png"
+>
   <main>
     <!-- Navigation -->
     <nav class='navbar'>
@@ -171,7 +177,7 @@ import LabLayout from '../layouts/LabLayout.astro';
     </section>
 
   </main>
-</LabLayout>
+</Layout>
 
 <!-- JavaScript -->
 <script src='/assets/js/app.js' type='module'></script>
